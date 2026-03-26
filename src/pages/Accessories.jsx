@@ -2,25 +2,56 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+// All shop products — each maps to a ProductCardImproved card
+const PRODUCTS = [
+  { id:1,  category:'Plants',                  badge:'New',        name:'Monstera Deliciosa',        description:'Iconic split-leaf plant. Medium indirect light. Ships in 5" nursery pot.',            includes:['1 healthy plant','Nursery pot','Care card'],    rating:5, reviews:319, price:499, originalPrice:699,  img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80' },
+  { id:2,  category:'Plants',                  badge:'Bestseller', name:'Snake Plant',               description:'Near-indestructible. Low light, low water. Best air purifier for bedrooms.',           includes:['1 healthy plant','4" pot','Care card'],         rating:5, reviews:445, price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80' },
+  { id:3,  category:'Plants',                  badge:null,         name:'Pothos Golden',             description:'Trailing vines with golden variegation. Thrives in almost any light condition.',       includes:['1 plant','Hanging pot','Care card'],            rating:4, reviews:267, price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80' },
+  { id:4,  category:'Pots & Planters',         badge:'Bestseller', name:'Terracotta Pot Set',        description:'Set of 3 classic terracotta pots. Breathable clay promotes healthy root growth.',       includes:['3 pots','Drainage holes','Saucers included'],   rating:4, reviews:128, price:349, originalPrice:499,  img:'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&q=80' },
+  { id:5,  category:'Pots & Planters',         badge:null,         name:'Ceramic White Planter',     description:'Minimalist matte white ceramic. Perfect for modern homes and desk setups.',             includes:['1 planter','Drainage hole'],                    rating:5, reviews:84,  price:599, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:6,  category:'Pots & Planters',         badge:'New',        name:'Hanging Macramé Planter',   description:'Handwoven cotton macramé. Great for trailing plants like Pothos.',                      includes:['1 hanger','Adjustable knot','Fits 4" pots'],    rating:4, reviews:56,  price:249, originalPrice:null, img:'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=400&q=80' },
+  { id:7,  category:'Soil & Fertilisers',      badge:'Bestseller', name:'Premium Potting Mix',       description:'Ready-to-use mix with cocopeat, perlite and compost. Perfect drainage for all plants.', includes:['5kg bag','Cocopeat','Perlite','Compost'],       rating:5, reviews:203, price:299, originalPrice:399,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:8,  category:'Soil & Fertilisers',      badge:null,         name:'Liquid Seaweed Fertiliser', description:'Organic seaweed extract. Boosts growth, roots and immunity.',                          includes:['250ml bottle','NPK balanced','Organic'],        rating:4, reviews:91,  price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:9,  category:'Soil & Fertilisers',      badge:null,         name:'Cactus & Succulent Mix',    description:'Fast-draining gritty mix for cacti, succulents and aloe.',                             includes:['2kg bag','Sand mix','Perlite heavy'],           rating:4, reviews:67,  price:179, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:10, category:'Tools',                   badge:null,         name:'Pruning Shears',            description:'Stainless steel bypass pruners with comfort grip. Clean cuts for healthy plants.',       includes:['1 pair','Safety lock','Stainless steel'],       rating:5, reviews:142, price:449, originalPrice:599,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:11, category:'Tools',                   badge:'Bestseller', name:'5-Piece Garden Tool Kit',   description:'Complete kit — trowel, fork, transplanter, weeder and pruner in a carry pouch.',        includes:['5 tools','Carry pouch','Stainless steel'],      rating:4, reviews:178, price:699, originalPrice:899,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:12, category:'Tools',                   badge:null,         name:'Soil Moisture Meter',       description:'No batteries needed. Instantly checks soil moisture to prevent over/under watering.',   includes:['1 meter','No batteries','3-in-1'],              rating:4, reviews:89,  price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:13, category:'Watering Cans & Misters', badge:null,         name:'Long Spout Watering Can',   description:'1.5L with long narrow spout for precise watering. Perfect for indoor plants.',          includes:['1.5L can','Long spout','Ergonomic handle'],     rating:4, reviews:63,  price:349, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:14, category:'Watering Cans & Misters', badge:'Bestseller', name:'Fine Mist Spray Bottle',    description:'360° nozzle adjustable from mist to stream. Ideal for humidity-loving tropicals.',       includes:['500ml','Adjustable nozzle','360° spray'],       rating:5, reviews:211, price:149, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+]
+
+// ── SUB-COMPONENTS ────────────────────────────────────────────────────────────
+
+// Top navigation bar with category dropdowns, search, profile and cart
 const ShopNav = ({ cartCount, onCartOpen }) => {
+  // Tracks which dropdown menu is currently open (null = none)
   const [openMenu, setOpenMenu] = useState(null)
+
+  // null = no dropdown; array = dropdown items to show on hover
   const menus = {
-    'Plants': ['Indoor Plants','Air Purifying Plants','Aromatic Plants','Low Maintenance','Flowering Plants','Hanging Plants','Aquatic Plants','Lucky Plants','Rare & Exotic'],
-    'Seeds': ['Vegetable Seeds','Flower Seeds','Herb Seeds','Microgreen Seeds','Fruit Seeds'],
-    'Sustainable': ['Eco Pots','Biodegradable Bags','Organic Fertilisers'],
-    'Gardening Kits': null,
+    'Plants':               ['Indoor Plants','Air Purifying Plants','Aromatic Plants','Low Maintenance','Flowering Plants','Hanging Plants','Aquatic Plants','Lucky Plants','Rare & Exotic'],
+    'Seeds':                ['Vegetable Seeds','Flower Seeds','Herb Seeds','Microgreen Seeds','Fruit Seeds'],
+    'Sustainable':          ['Eco Pots','Biodegradable Bags','Organic Fertilisers'],
+    'Gardening Kits':       null,
     'Gardening Essentials': null,
-    'Accessories': null,
-    'Bulbs': null,
+    'Accessories':          null,
+    'Bulbs':                null,
   }
+
   return (
     <div style={{ background:'#fff', borderBottom:'1px solid #f0f0f0', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
       <div style={{ display:'flex', alignItems:'center', gap:'20px', padding:'0 32px', height:'60px', maxWidth:'1440px', margin:'0 auto' }}>
+
+        {/* Logo */}
         <Link to="/" style={{ textDecoration:'none', flexShrink:0 }}>
           <span style={{ fontFamily:"'Playfair Display',serif", fontSize:'20px', fontWeight:'700', color:'var(--text-hero)' }}>
             Gree<span style={{ color:'var(--accent)' }}>Looker</span>
           </span>
         </Link>
+
+        {/* Category nav — shows dropdown on hover if menu has items */}
         <div style={{ display:'flex', alignItems:'center', gap:'0px', flex:1, justifyContent:'center' }}>
           {Object.keys(menus).map(name => (
             <div key={name} style={{ position:'relative' }}
@@ -43,6 +74,8 @@ const ShopNav = ({ cartCount, onCartOpen }) => {
             </div>
           ))}
         </div>
+
+        {/* Right side — search, profile icon, cart icon */}
         <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink:0 }}>
           <div style={{ position:'relative' }}>
             <span style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#888' }}>🔍</span>
@@ -55,6 +88,7 @@ const ShopNav = ({ cartCount, onCartOpen }) => {
             <span style={{ fontSize:'18px' }}>👤</span>
             <span style={{ fontSize:'10px', fontWeight:'600' }}>Profile</span>
           </Link>
+          {/* Cart button shows item count badge when cart is not empty */}
           <button onClick={onCartOpen} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', background:'none', border:'none', cursor:'pointer', padding:'4px 10px', color:'#333', position:'relative' }}>
             <span style={{ fontSize:'18px' }}>🛒</span>
             <span style={{ fontSize:'10px', fontWeight:'600' }}>Cart</span>
@@ -66,11 +100,16 @@ const ShopNav = ({ cartCount, onCartOpen }) => {
   )
 }
 
+// Left sidebar with collapsible filter sections (category, price, light, etc.)
 const FilterSidebar = ({ filters, setFilters }) => {
+  // Tracks which accordion sections are open
   const [open, setOpen] = useState({ category:true, price:false, availability:false, season:false, growth:false, light:false })
   const toggle = (key) => setOpen(p => ({ ...p, [key]: !p[key] }))
+
+  // True if any filter is currently active — used to show "Clear All" button
   const hasFilters = Object.values(filters).some(v => Array.isArray(v) ? v.length > 0 : !!v)
 
+  // Reusable collapsible section wrapper
   const Section = ({ id, label, children }) => (
     <div style={{ borderBottom:'1px solid #f0f0f0' }}>
       <button onClick={() => toggle(id)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', background:'none', border:'none', cursor:'pointer', padding:'14px 0', fontFamily:"'DM Sans',sans-serif" }}>
@@ -81,6 +120,7 @@ const FilterSidebar = ({ filters, setFilters }) => {
     </div>
   )
 
+  // Reusable custom-styled checkbox that updates the filters state
   const Checkbox = ({ label, count, filterKey, value }) => {
     const checked = filters[filterKey]?.includes(value) || false
     return (
@@ -88,6 +128,7 @@ const FilterSidebar = ({ filters, setFilters }) => {
         <div style={{ width:'16px', height:'16px', borderRadius:'3px', border:`2px solid ${checked ? 'var(--accent)' : '#ddd'}`, background: checked ? 'var(--accent)' : '#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, transition:'all 0.15s' }}>
           {checked && <span style={{ color:'#fff', fontSize:'10px', fontWeight:'700' }}>✓</span>}
         </div>
+        {/* Hidden native checkbox — visual is handled by the div above */}
         <input type="checkbox" checked={checked} style={{ display:'none' }}
           onChange={e => {
             setFilters(prev => {
@@ -115,6 +156,7 @@ const FilterSidebar = ({ filters, setFilters }) => {
       </Section>
 
       <Section id="price" label="Price">
+        {/* Manual min/max inputs */}
         <div style={{ display:'flex', gap:'8px', marginBottom:'10px' }}>
           <input type="number" placeholder="Min" value={filters.priceMin||''} onChange={e => setFilters(p => ({...p, priceMin:e.target.value}))}
             style={{ width:'80px', padding:'8px 10px', border:'1px solid #e0e0e0', borderRadius:'4px', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
@@ -122,6 +164,7 @@ const FilterSidebar = ({ filters, setFilters }) => {
           <input type="number" placeholder="Max" value={filters.priceMax||''} onChange={e => setFilters(p => ({...p, priceMax:e.target.value}))}
             style={{ width:'80px', padding:'8px 10px', border:'1px solid #e0e0e0', borderRadius:'4px', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
         </div>
+        {/* Quick preset price range pills */}
         <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
           {[['Under ₹299',0,299],['₹300–599',300,599],['₹600+',600,99999]].map(([label,min,max]) => (
             <button key={label} onClick={() => setFilters(p => ({...p, priceMin:min, priceMax:max}))}
@@ -160,12 +203,18 @@ const FilterSidebar = ({ filters, setFilters }) => {
   )
 }
 
+// Slide-in cart panel from the right — shows items, quantity controls and total
 const CartDrawer = ({ cart, onClose, onRemove, onChangeQty }) => {
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+
   return (
     <>
+      {/* Dark backdrop — clicking it closes the drawer */}
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:99 }} />
+
       <div style={{ position:'fixed', top:0, right:0, height:'100vh', width:'400px', background:'#fff', zIndex:100, display:'flex', flexDirection:'column', boxShadow:'-4px 0 24px rgba(0,0,0,0.15)' }}>
+
+        {/* Header */}
         <div style={{ padding:'20px 24px', borderBottom:'1px solid #f0f0f0', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:'20px', color:'#222', fontWeight:'700', margin:0 }}>My Cart</h2>
@@ -174,6 +223,7 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty }) => {
           <button onClick={onClose} style={{ background:'none', border:'1px solid #e0e0e0', borderRadius:'50%', width:'32px', height:'32px', cursor:'pointer', fontSize:'16px', color:'#666', display:'flex', alignItems:'center', justifyContent:'center' }}>×</button>
         </div>
 
+        {/* Cart items or empty state */}
         <div style={{ flex:1, overflowY:'auto', padding:'16px' }}>
           {cart.length === 0 ? (
             <div style={{ textAlign:'center', padding:'60px 24px' }}>
@@ -189,6 +239,7 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty }) => {
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:'13px', fontWeight:'600', color:'#222', lineHeight:'1.4' }}>{item.name}</div>
                 <div style={{ fontSize:'13px', color:'#888', marginTop:'2px' }}>₹{item.price}</div>
+                {/* Quantity stepper + remove button */}
                 <div style={{ display:'flex', alignItems:'center', gap:'12px', marginTop:'10px' }}>
                   <div style={{ display:'flex', alignItems:'center', border:'1px solid #e0e0e0', borderRadius:'4px', overflow:'hidden' }}>
                     <button onClick={() => onChangeQty(item.id,-1)} style={{ width:'28px', height:'28px', background:'#f8f8f8', border:'none', cursor:'pointer', fontSize:'16px', color:'#333', display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
@@ -203,6 +254,7 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty }) => {
           ))}
         </div>
 
+        {/* Sticky footer with totals and place order button */}
         {cart.length > 0 && (
           <div style={{ padding:'20px 24px', borderTop:'1px solid #f0f0f0' }}>
             <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'8px' }}>
@@ -214,7 +266,7 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty }) => {
               <span style={{ fontSize:'15px', fontWeight:'700', color:'var(--accent)' }}>₹{total}</span>
             </div>
             <div style={{ fontSize:'11px', color:'var(--accent)', textAlign:'center', marginBottom:'12px', fontWeight:'600' }}>🚚 FREE delivery on orders above ₹499</div>
-            <button style={{ width:'100%', padding:'14px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'14px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif', letterSpacing:'0.05em'" }}>
+            <button style={{ width:'100%', padding:'14px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'14px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", letterSpacing:'0.05em' }}>
               PLACE ORDER →
             </button>
           </div>
@@ -224,27 +276,11 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty }) => {
   )
 }
 
-const PRODUCTS = [
-  { id:1,  category:'Plants',                  badge:'New',        name:'Monstera Deliciosa',        description:'Iconic split-leaf plant. Medium indirect light. Ships in 5" nursery pot.',            includes:['1 healthy plant','Nursery pot','Care card'],    rating:5, reviews:319, price:499, originalPrice:699,  img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80' },
-  { id:2,  category:'Plants',                  badge:'Bestseller', name:'Snake Plant',               description:'Near-indestructible. Low light, low water. Best air purifier for bedrooms.',           includes:['1 healthy plant','4" pot','Care card'],         rating:5, reviews:445, price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80' },
-  { id:3,  category:'Plants',                  badge:null,         name:'Pothos Golden',             description:'Trailing vines with golden variegation. Thrives in almost any light condition.',       includes:['1 plant','Hanging pot','Care card'],            rating:4, reviews:267, price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80' },
-  { id:4,  category:'Pots & Planters',         badge:'Bestseller', name:'Terracotta Pot Set',        description:'Set of 3 classic terracotta pots. Breathable clay promotes healthy root growth.',       includes:['3 pots','Drainage holes','Saucers included'],   rating:4, reviews:128, price:349, originalPrice:499,  img:'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&q=80' },
-  { id:5,  category:'Pots & Planters',         badge:null,         name:'Ceramic White Planter',     description:'Minimalist matte white ceramic. Perfect for modern homes and desk setups.',             includes:['1 planter','Drainage hole'],                    rating:5, reviews:84,  price:599, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:6,  category:'Pots & Planters',         badge:'New',        name:'Hanging Macramé Planter',   description:'Handwoven cotton macramé. Great for trailing plants like Pothos.',                      includes:['1 hanger','Adjustable knot','Fits 4" pots'],    rating:4, reviews:56,  price:249, originalPrice:null, img:'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=400&q=80' },
-  { id:7,  category:'Soil & Fertilisers',      badge:'Bestseller', name:'Premium Potting Mix',       description:'Ready-to-use mix with cocopeat, perlite and compost. Perfect drainage for all plants.', includes:['5kg bag','Cocopeat','Perlite','Compost'],       rating:5, reviews:203, price:299, originalPrice:399,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:8,  category:'Soil & Fertilisers',      badge:null,         name:'Liquid Seaweed Fertiliser', description:'Organic seaweed extract. Boosts growth, roots and immunity.',                          includes:['250ml bottle','NPK balanced','Organic'],        rating:4, reviews:91,  price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:9,  category:'Soil & Fertilisers',      badge:null,         name:'Cactus & Succulent Mix',    description:'Fast-draining gritty mix for cacti, succulents and aloe.',                             includes:['2kg bag','Sand mix','Perlite heavy'],           rating:4, reviews:67,  price:179, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:10, category:'Tools',                   badge:null,         name:'Pruning Shears',            description:'Stainless steel bypass pruners with comfort grip. Clean cuts for healthy plants.',       includes:['1 pair','Safety lock','Stainless steel'],       rating:5, reviews:142, price:449, originalPrice:599,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:11, category:'Tools',                   badge:'Bestseller', name:'5-Piece Garden Tool Kit',   description:'Complete kit — trowel, fork, transplanter, weeder and pruner in a carry pouch.',        includes:['5 tools','Carry pouch','Stainless steel'],      rating:4, reviews:178, price:699, originalPrice:899,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:12, category:'Tools',                   badge:null,         name:'Soil Moisture Meter',       description:'No batteries needed. Instantly checks soil moisture to prevent over/under watering.',   includes:['1 meter','No batteries','3-in-1'],              rating:4, reviews:89,  price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:13, category:'Watering Cans & Misters', badge:null,         name:'Long Spout Watering Can',   description:'1.5L with long narrow spout for precise watering. Perfect for indoor plants.',          includes:['1.5L can','Long spout','Ergonomic handle'],     rating:4, reviews:63,  price:349, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:14, category:'Watering Cans & Misters', badge:'Bestseller', name:'Fine Mist Spray Bottle',    description:'360° nozzle adjustable from mist to stream. Ideal for humidity-loving tropicals.',       includes:['500ml','Adjustable nozzle','360° spray'],       rating:5, reviews:211, price:149, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-]
-
+// Individual product card — shows image, wishlist, badge, hover add-to-cart and price
 const ProductCardImproved = ({ product, onAddToCart }) => {
-  const [added, setAdded] = useState(false)
-  const [wishlist, setWishlist] = useState(false)
-  const [hovered, setHovered] = useState(false)
+  const [added, setAdded]       = useState(false)   // briefly true after clicking "Add to Cart"
+  const [wishlist, setWishlist] = useState(false)   // toggles heart icon
+  const [hovered, setHovered]   = useState(false)   // shows hover overlay
 
   const handleAdd = () => {
     onAddToCart(product)
@@ -252,6 +288,7 @@ const ProductCardImproved = ({ product, onAddToCart }) => {
     setTimeout(() => setAdded(false), 1500)
   }
 
+  // Calculate discount % from original price (null if no original price)
   const discount = product.originalPrice ? Math.round((1 - product.price/product.originalPrice)*100) : null
 
   return (
@@ -259,32 +296,33 @@ const ProductCardImproved = ({ product, onAddToCart }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}>
 
-      {/* Image */}
+      {/* Product image with zoom on hover */}
       <div style={{ position:'relative', paddingTop:'120%', background:'#f8f8f8', overflow:'hidden' }}>
         <img src={product.img} alt={product.name}
           style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.4s ease', transform: hovered ? 'scale(1.06)' : 'scale(1)' }}
           onError={e => e.target.style.display='none'} />
 
-        {/* Wishlist */}
+        {/* Wishlist toggle — stops click from bubbling to card */}
         <button onClick={e => { e.stopPropagation(); setWishlist(!wishlist) }}
           style={{ position:'absolute', top:'10px', right:'10px', background:'#fff', border:'none', borderRadius:'50%', width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 8px rgba(0,0,0,0.12)', fontSize:'16px', zIndex:2 }}>
           {wishlist ? '❤️' : '🤍'}
         </button>
 
-        {/* Badges */}
+        {/* Badge (Bestseller / New) */}
         {product.badge && (
           <span style={{ position:'absolute', top:'10px', left:'10px', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background: product.badge==='Bestseller' ? '#ff6161' : product.badge==='New' ? 'var(--accent)' : '#ff6161', color:'#fff', letterSpacing:'0.04em', zIndex:2 }}>
             {product.badge.toUpperCase()}
           </span>
         )}
 
+        {/* Discount % badge (bottom-left) */}
         {discount && (
           <span style={{ position:'absolute', bottom:'10px', left:'10px', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background:'#14a800', color:'#fff', zIndex:2 }}>
             {discount}% OFF
           </span>
         )}
 
-        {/* Add to cart on hover */}
+        {/* "Add to Cart" bar slides up from bottom on hover */}
         <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'var(--text-hero)', padding:'12px', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', transform: hovered ? 'translateY(0)' : 'translateY(100%)', transition:'transform 0.25s ease', zIndex:3 }}
           onClick={e => { e.stopPropagation(); handleAdd() }}>
           <span style={{ fontSize:'16px' }}>{added ? '✓' : '🛒'}</span>
@@ -292,13 +330,14 @@ const ProductCardImproved = ({ product, onAddToCart }) => {
         </div>
       </div>
 
-      {/* Info */}
+      {/* Product info */}
       <div style={{ padding:'12px 12px 14px' }}>
         <div style={{ fontSize:'11px', color:'#888', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:'4px' }}>{product.category}</div>
         <div style={{ fontSize:'14px', fontWeight:'600', color:'#222', lineHeight:'1.4', marginBottom:'6px' }}>{product.name}</div>
+        {/* Description clamped to 2 lines */}
         <div style={{ fontSize:'12px', color:'#888', lineHeight:'1.5', marginBottom:'8px', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{product.description}</div>
 
-        {/* Rating */}
+        {/* Star rating */}
         <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:'3px', background:'var(--accent)', color:'#fff', fontSize:'11px', fontWeight:'700', padding:'2px 7px', borderRadius:'2px' }}>
             {product.rating} ★
@@ -306,7 +345,7 @@ const ProductCardImproved = ({ product, onAddToCart }) => {
           <span style={{ fontSize:'11px', color:'#888' }}>({product.reviews.toLocaleString()})</span>
         </div>
 
-        {/* Price */}
+        {/* Price with strikethrough original and discount % */}
         <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
           <span style={{ fontSize:'16px', fontWeight:'700', color:'#222' }}>₹{product.price}</span>
           {product.originalPrice && <span style={{ fontSize:'13px', color:'#aaa', textDecoration:'line-through' }}>₹{product.originalPrice}</span>}
@@ -317,13 +356,16 @@ const ProductCardImproved = ({ product, onAddToCart }) => {
   )
 }
 
-const Accessories = () => {
-  const [cart, setCart] = useState([])
-  const [cartOpen, setCartOpen] = useState(false)
-  const [filters, setFilters] = useState({})
-  const [sortBy, setSortBy] = useState('featured')
-  const [viewMode, setViewMode] = useState('grid')
+// ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 
+const Accessories = () => {
+  const [cart, setCart]         = useState([])
+  const [cartOpen, setCartOpen] = useState(false)
+  const [filters, setFilters]   = useState({})
+  const [sortBy, setSortBy]     = useState('featured')
+  const [viewMode, setViewMode] = useState('grid')   // 'grid' or 'list'
+
+  // Add item to cart; increment qty if already exists
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(i => i.id === product.id)
@@ -333,8 +375,11 @@ const Accessories = () => {
   }
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id))
+
+  // delta is +1 or -1; removes item if qty drops to 0
   const changeQty = (id, delta) => setCart(prev => prev.map(i => i.id===id ? {...i, qty:i.qty+delta} : i).filter(i => i.qty > 0))
 
+  // Filter products by active filter state
   let filtered = PRODUCTS.filter(p => {
     const matchCategory = !filters.category?.length || filters.category.includes(p.category)
     const matchPriceMin = !filters.priceMin || p.price >= Number(filters.priceMin)
@@ -342,12 +387,15 @@ const Accessories = () => {
     return matchCategory && matchPriceMin && matchPriceMax
   })
 
+  // Sort filtered results based on selected sort option
   if (sortBy === 'price_asc')  filtered = [...filtered].sort((a,b) => a.price - b.price)
   if (sortBy === 'price_desc') filtered = [...filtered].sort((a,b) => b.price - a.price)
   if (sortBy === 'rating')     filtered = [...filtered].sort((a,b) => b.rating - a.rating)
 
+  // Total item count shown on cart icon badge
   const cartCount = cart.reduce((sum,i) => sum+i.qty, 0)
 
+  // Active filter pills shown in the top bar — each has a clear callback
   const activeFilters = [
     ...(filters.category||[]).map(v => ({ label:v, clear:() => setFilters(p => ({...p, category:(p.category||[]).filter(c=>c!==v)})) })),
     ...(filters.priceMin ? [{ label:`₹${filters.priceMin}–${filters.priceMax}`, clear:() => setFilters(p => ({...p, priceMin:undefined, priceMax:undefined})) }] : []),
@@ -357,7 +405,7 @@ const Accessories = () => {
     <div style={{ minHeight:'100vh', background:'#fafafa', display:'flex', flexDirection:'column' }}>
       <ShopNav cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
 
-      {/* Breadcrumb */}
+      {/* Breadcrumb trail */}
       <div style={{ background:'#fff', borderBottom:'1px solid #f0f0f0', padding:'10px 32px' }}>
         <div style={{ maxWidth:'1440px', margin:'0 auto', fontSize:'12px', color:'#888', display:'flex', gap:'6px', alignItems:'center' }}>
           <Link to="/" style={{ color:'#888', textDecoration:'none' }}>Home</Link>
@@ -371,7 +419,7 @@ const Accessories = () => {
 
         <div style={{ flex:1, padding:'20px 24px' }}>
 
-          {/* Top bar */}
+          {/* Toolbar — product count, active filter pills, sort dropdown, grid/list toggle */}
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'16px', background:'#fff', padding:'12px 16px', borderRadius:'4px', border:'1px solid #f0f0f0' }}>
             <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
               <span style={{ fontSize:'13px', color:'#888' }}>
@@ -395,6 +443,7 @@ const Accessories = () => {
                   <option value="rating">Customer Rating</option>
                 </select>
               </div>
+              {/* Grid / list view toggle */}
               <div style={{ display:'flex', gap:'4px' }}>
                 {['grid','list'].map(mode => (
                   <button key={mode} onClick={() => setViewMode(mode)}
@@ -406,7 +455,7 @@ const Accessories = () => {
             </div>
           </div>
 
-          {/* Products */}
+          {/* Product grid or empty state */}
           {filtered.length === 0 ? (
             <div style={{ textAlign:'center', padding:'80px', background:'#fff', borderRadius:'4px' }}>
               <div style={{ fontSize:'48px', marginBottom:'16px' }}>🌿</div>
@@ -426,6 +475,7 @@ const Accessories = () => {
         </div>
       </div>
 
+      {/* Cart drawer — only rendered when open */}
       {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} onRemove={removeFromCart} onChangeQty={changeQty} />}
     </div>
   )

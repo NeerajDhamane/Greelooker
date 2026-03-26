@@ -4,7 +4,9 @@ import { Link } from "react-router-dom"
 import cm1 from '../assets/commercials/cafecomm.jpg'
 import cm2 from '../assets/commercials/officecomm.jpg'
 
-// ── TRUST STRIP ──
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+// Scrolling trust badges shown at the bottom of the hero
 const TRUST_ITEMS = [
   '🌿 Beginner Friendly',
   '🚚 Ships Across India',
@@ -14,21 +16,7 @@ const TRUST_ITEMS = [
   '🤖 AI-Powered Recommendations',
 ]
 
-const TrustStrip = () => (
-  <div style={{ background: 'var(--text-hero)', overflow: 'hidden', padding: '10px 0' }}>
-    <div style={{ display: 'flex', gap: '40px', alignItems: 'center', animation: 'trustScroll 24s linear infinite', whiteSpace: 'nowrap', width: 'max-content' }}>
-      {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
-        <span key={i} style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.75)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {item}
-          <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '14px' }}>·</span>
-        </span>
-      ))}
-    </div>
-    <style>{`@keyframes trustScroll { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }`}</style>
-  </div>
-)
-
-// ── BESTSELLERS DATA ──
+// Product cards shown in the auto-scrolling bestsellers row
 const BESTSELLERS = [
   { name: 'Monstera Deliciosa',     category: 'Plants',          img: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80',  price: 499, originalPrice: 699,  rating: 5, reviews: 319, discount: '-29%', badge: null        },
   { name: 'Snake Plant',            category: 'Plants',          img: 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80',  price: 299, originalPrice: null, rating: 5, reviews: 445, discount: null,   badge: 'Bestseller' },
@@ -42,7 +30,7 @@ const BESTSELLERS = [
   { name: 'Ceramic White Planter',  category: 'Pots & Planters', img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80',  price: 599, originalPrice: null, rating: 5, reviews: 84,  discount: null,   badge: 'New'       },
 ]
 
-// ── CATEGORIES DATA ──
+// Shop by category grid — each links to the relevant page
 const CATEGORIES = [
   { name: 'Indoor Plants',      emoji: '🪴', path: '/accessories' },
   { name: 'Air Purifying',      emoji: '💨', path: '/accessories' },
@@ -56,80 +44,34 @@ const CATEGORIES = [
   { name: 'Lucky Plants',       emoji: '🍀', path: '/accessories' },
 ]
 
-// ── GIFT CARDS DATA ──
+// Gift product cards shown in the gifting section
 const GIFT_CARDS = [
-  { title: 'Date Night',    tag: 'For the one who makes your heart bloom',        seed: '🌱 Rose seeds inside',       price: 'From ₹999', badge: 'Most Loved', img: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80',  blob: '#c9dbb2', extra: 'Wildflower bouquet · plantable mud base · rose seeds'     },
-  { title: 'Anniversary',   tag: 'Celebrate what keeps growing between you',      seed: '🌱 Jasmine seeds inside',    price: 'From ₹899', badge: null,          img: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=600&q=80',  blob: '#7fb069', extra: 'Jasmine bouquet · plantable base · gift ribbon'            },
-  { title: 'Birthday',      tag: 'A gift that grows as they do',                  seed: '🌱 Sunflower seeds inside',  price: 'From ₹699', badge: null,          img: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80', blob: '#3a7d44', extra: 'Seasonal bouquet · sunflower seed base · card'              },
-  { title: 'Just Because',  tag: "No reason needed. Plants don't need one either", seed: '🌱 Wildflower seeds inside', price: 'From ₹599', badge: null,          img: 'https://images.unsplash.com/photo-1490750967868-88df5691cc05?w=600&q=80', blob: '#c9dbb2', extra: 'Mixed wildflower bouquet · plantable mud base'              },
+  { title: 'Date Night',   tag: 'For the one who makes your heart bloom',         seed: '🌱 Rose seeds inside',       price: 'From ₹999', badge: 'Most Loved', img: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80',  blob: '#c9dbb2', extra: 'Wildflower bouquet · plantable mud base · rose seeds'  },
+  { title: 'Anniversary',  tag: 'Celebrate what keeps growing between you',       seed: '🌱 Jasmine seeds inside',    price: 'From ₹899', badge: null,          img: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=600&q=80',  blob: '#7fb069', extra: 'Jasmine bouquet · plantable base · gift ribbon'         },
+  { title: 'Birthday',     tag: 'A gift that grows as they do',                   seed: '🌱 Sunflower seeds inside',  price: 'From ₹699', badge: null,          img: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80', blob: '#3a7d44', extra: 'Seasonal bouquet · sunflower seed base · card'           },
+  { title: 'Just Because', tag: "No reason needed. Plants don't need one either", seed: '🌱 Wildflower seeds inside', price: 'From ₹599', badge: null,          img: 'https://images.unsplash.com/photo-1490750967868-88df5691cc05?w=600&q=80', blob: '#c9dbb2', extra: 'Mixed wildflower bouquet · plantable mud base'           },
 ]
 
-// ── FAQ DATA ──
+// Accordion FAQ items
 const FAQS = [
-  { q: 'What makes GreeLooker different?',             a: 'We use AI to match plants specifically to your space — your city, floor, light, and room type. Not generic lists, actual matches that will thrive.' },
-  { q: 'How does the AI recommendation work?',         a: 'You fill out a short quiz and upload a room photo. Our AI analyses light levels, layout and vibe to recommend plants with the highest survival chance.' },
-  { q: 'Do you deliver live plants across India?',     a: 'Yes! We ship live plants across India with special breathable packaging. Most metros get delivery in 3–5 days.' },
-  { q: "What if my plant doesn't survive?",            a: "We offer a 30-day survival guarantee. If your plant doesn't make it, we'll replace it for free. No questions asked." },
-  { q: 'Can I use GreeLooker for my office or café?',  a: 'Absolutely. Our Commercials section is built for B2B clients — we design, install and maintain green spaces for offices, cafés and hotels.' },
-  { q: 'Are your bouquets really plantable?',          a: 'Yes — every bouquet comes with a mud base embedded with seeds. When the flowers dry out, you plant the base and wildflowers grow from it.' },
+  { q: 'What makes GreeLooker different?',            a: 'We use AI to match plants specifically to your space — your city, floor, light, and room type. Not generic lists, actual matches that will thrive.' },
+  { q: 'How does the AI recommendation work?',        a: 'You fill out a short quiz and upload a room photo. Our AI analyses light levels, layout and vibe to recommend plants with the highest survival chance.' },
+  { q: 'Do you deliver live plants across India?',    a: 'Yes! We ship live plants across India with special breathable packaging. Most metros get delivery in 3–5 days.' },
+  { q: "What if my plant doesn't survive?",           a: "We offer a 30-day survival guarantee. If your plant doesn't make it, we'll replace it for free. No questions asked." },
+  { q: 'Can I use GreeLooker for my office or café?', a: 'Absolutely. Our Commercials section is built for B2B clients — we design, install and maintain green spaces for offices, cafés and hotels.' },
+  { q: 'Are your bouquets really plantable?',         a: 'Yes — every bouquet comes with a mud base embedded with seeds. When the flowers dry out, you plant the base and wildflowers grow from it.' },
 ]
 
-// ── HOW IT WORKS STEPS ──
+// Steps shown in the "How it works" section
 const HOW_STEPS = [
-  { num: '01', title: 'Tell us your space',  desc: 'Room size, sunlight, city — we build your plant profile.',       img: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=500&q=80', color: 'var(--accent)', ring: 'rgba(58,125,68,0.08)',   shadow: 'rgba(58,125,68,0.28)'  },
-  { num: '02', title: 'Upload a photo',      desc: 'Snap your room. AI reads your light and layout.',                img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=80', color: 'var(--leaf)',   ring: 'rgba(127,176,105,0.08)', shadow: 'rgba(127,176,105,0.25)' },
-  { num: '03', title: 'AI recommends',       desc: '500+ plants scored and matched to your space.',                  img: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=500&q=80', color: 'var(--accent)', ring: 'rgba(58,125,68,0.08)',   shadow: 'rgba(58,125,68,0.28)'  },
-  { num: '04', title: 'See your matches',    desc: 'Browse your personalised list with care tips.',                  img: 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=500&q=80', color: 'var(--leaf)',   ring: 'rgba(127,176,105,0.08)', shadow: 'rgba(127,176,105,0.25)' },
-  { num: '05', title: 'Pick your plan',      desc: 'Go free or unlock yearly delivery and expert care.',             img: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&q=80', color: 'var(--accent)', ring: 'rgba(58,125,68,0.1)',    shadow: 'rgba(58,125,68,0.35)'  },
+  { num: '01', title: 'Tell us your space', desc: 'Room size, sunlight, city — we build your plant profile.',  img: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=500&q=80', color: 'var(--accent)', ring: 'rgba(58,125,68,0.08)',   shadow: 'rgba(58,125,68,0.28)'   },
+  { num: '02', title: 'Upload a photo',     desc: 'Snap your room. AI reads your light and layout.',           img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=80', color: 'var(--leaf)',   ring: 'rgba(127,176,105,0.08)', shadow: 'rgba(127,176,105,0.25)' },
+  { num: '03', title: 'AI recommends',      desc: '500+ plants scored and matched to your space.',             img: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=500&q=80', color: 'var(--accent)', ring: 'rgba(58,125,68,0.08)',   shadow: 'rgba(58,125,68,0.28)'   },
+  { num: '04', title: 'See your matches',   desc: 'Browse your personalised list with care tips.',             img: 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=500&q=80', color: 'var(--leaf)',   ring: 'rgba(127,176,105,0.08)', shadow: 'rgba(127,176,105,0.25)' },
+  { num: '05', title: 'Pick your plan',     desc: 'Go free or unlock yearly delivery and expert care.',        img: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&q=80', color: 'var(--accent)', ring: 'rgba(58,125,68,0.1)',    shadow: 'rgba(58,125,68,0.35)'   },
 ]
 
-// Curved SVG connector between steps (alternates up/down based on direction)
-const StepConnector = ({ id, direction, animDelay }) => {
-  const isUp = direction === 'up'
-  const path = isUp
-    ? 'M 10 140 C 10 60, 70 60, 70 10'
-    : 'M 10 10 C 10 80, 70 80, 70 140'
-
-  // Opacity keyTimes for each connector so only one dot is visible at a time
-  const opacityMap = {
-    1: '0;1;1;0;0;0;0;0;0;0',
-    2: '0;0;0;1;1;0;0;0;0;0',
-    3: '0;0;0;0;0;1;1;0;0;0',
-    4: '0;0;0;0;0;0;0;1;1;0',
-  }
-  const keyTimesMap = {
-    1: '0;0.05;0.22;0.27;0.5;0.51;0.75;0.76;0.99;1',
-    2: '0;0.25;0.26;0.27;0.48;0.52;0.75;0.76;0.99;1',
-    3: '0;0.25;0.49;0.52;0.73;0.77;0.99;1;1;1',
-    4: '0;0.25;0.49;0.74;0.76;0.77;0.98;1;1;1',
-  }
-
-  return (
-    <div style={{ flexShrink: 0, width: '80px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '-80px' }}>
-      <svg width="80" height="180" viewBox="0 0 80 180" overflow="visible">
-        <defs>
-          <marker id={`a${id}`} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="var(--accent)" />
-          </marker>
-          <filter id={`glow${id}`}>
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-        <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeDasharray="8 6" opacity="0.5" markerEnd={`url(#a${id})`} />
-        <path id={`p${id}`} d={path} fill="none" />
-        <circle r="6" fill="var(--accent)" filter={`url(#glow${id})`}>
-          <animateMotion dur="8s" repeatCount="indefinite" calcMode="linear">
-            <mpath href={`#p${id}`} />
-          </animateMotion>
-          <animate attributeName="opacity" values={opacityMap[id]} keyTimes={keyTimesMap[id]} dur="8s" repeatCount="indefinite" />
-        </circle>
-      </svg>
-    </div>
-  )
-}
-
-// ── SOCIAL ICONS ──
+// Social media link icons rendered inline as SVGs
 const SOCIAL_LINKS = [
   {
     href: 'https://www.instagram.com/neerajspams12/',
@@ -178,27 +120,97 @@ const SOCIAL_LINKS = [
   },
 ]
 
-// ── MAIN COMPONENT ──
+// ── SUB-COMPONENTS ────────────────────────────────────────────────────────────
+
+// Infinite scrolling marquee strip pinned to the bottom of the hero
+const TrustStrip = () => (
+  <div style={{ background: 'var(--text-hero)', overflow: 'hidden', padding: '10px 0' }}>
+    <div style={{ display: 'flex', gap: '40px', alignItems: 'center', animation: 'trustScroll 24s linear infinite', whiteSpace: 'nowrap', width: 'max-content' }}>
+      {/* Duplicate items so the scroll looks infinite */}
+      {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
+        <span key={i} style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.75)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {item}
+          <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '14px' }}>·</span>
+        </span>
+      ))}
+    </div>
+    <style>{`@keyframes trustScroll { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }`}</style>
+  </div>
+)
+
+// Animated SVG curve with a moving dot connecting two "How it works" steps
+const StepConnector = ({ id, direction }) => {
+  const isUp = direction === 'up'
+  // Path curves up or down depending on which steps are adjacent
+  const path = isUp
+    ? 'M 10 140 C 10 60, 70 60, 70 10'
+    : 'M 10 10 C 10 80, 70 80, 70 140'
+
+  // Controls when each animated dot is visible (one at a time per connector)
+  const opacityMap = {
+    1: '0;1;1;0;0;0;0;0;0;0',
+    2: '0;0;0;1;1;0;0;0;0;0',
+    3: '0;0;0;0;0;1;1;0;0;0',
+    4: '0;0;0;0;0;0;0;1;1;0',
+  }
+  const keyTimesMap = {
+    1: '0;0.05;0.22;0.27;0.5;0.51;0.75;0.76;0.99;1',
+    2: '0;0.25;0.26;0.27;0.48;0.52;0.75;0.76;0.99;1',
+    3: '0;0.25;0.49;0.52;0.73;0.77;0.99;1;1;1',
+    4: '0;0.25;0.49;0.74;0.76;0.77;0.98;1;1;1',
+  }
+
+  return (
+    <div style={{ flexShrink: 0, width: '80px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '-80px' }}>
+      <svg width="80" height="180" viewBox="0 0 80 180" overflow="visible">
+        <defs>
+          <marker id={`a${id}`} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--accent)" />
+          </marker>
+          <filter id={`glow${id}`}>
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        {/* Dashed path line */}
+        <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeDasharray="8 6" opacity="0.5" markerEnd={`url(#a${id})`} />
+        {/* Invisible path that the dot follows */}
+        <path id={`p${id}`} d={path} fill="none" />
+        {/* Glowing dot that travels along the path */}
+        <circle r="6" fill="var(--accent)" filter={`url(#glow${id})`}>
+          <animateMotion dur="8s" repeatCount="indefinite" calcMode="linear">
+            <mpath href={`#p${id}`} />
+          </animateMotion>
+          <animate attributeName="opacity" values={opacityMap[id]} keyTimes={keyTimesMap[id]} dur="8s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    </div>
+  )
+}
+
+// ── MAIN COMPONENT ────────────────────────────────────────────────────────────
+
 const Home = () => {
+  // Tracks which commercial image to show (cafe or office)
   const [activeProject, setActiveProject] = useState('cafe')
+  // Tracks which FAQ is open (null = all closed)
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
     <div style={{ background: 'var(--bg)' }}>
 
-      {/* ══════════════════════════════════════════
-          PAGE 1 — HERO
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 1: HERO ───────────────────────────────────────────────── */}
       <section style={{ height: 'calc(100vh - 60px)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: 'var(--bg)' }}>
 
-        {/* Background blob */}
+        {/* Soft radial glow behind the hero text */}
         <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '500px', borderRadius: '50%', opacity: 0.25, background: 'radial-gradient(circle, var(--soft-leaf), transparent 70%)', pointerEvents: 'none', filter: 'blur(40px)' }} />
 
         <FloatingPlants />
 
-        {/* Hero content */}
+        {/* Center-aligned hero text, CTA buttons and stats */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px 24px 0', position: 'relative', zIndex: 1 }}>
 
+          {/* Pill badge above the heading */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 18px', borderRadius: '50px', background: 'var(--pill)', border: '1.5px solid var(--border)', fontSize: '11px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '24px' }}>
             🌿 Plant care, reimagined
           </div>
@@ -213,6 +225,7 @@ const Home = () => {
             Track your plants. Build greener spaces. Gift sustainably.
           </p>
 
+          {/* Primary + secondary CTA buttons */}
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '48px' }}>
             <Link to="/recommend">
               <button style={{ padding: '13px 32px', borderRadius: '50px', border: 'none', background: 'var(--text-hero)', color: '#fff', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: "'DM Sans',sans-serif" }}>
@@ -226,7 +239,7 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* Stats */}
+          {/* Four key stats separated by vertical dividers */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[['500+', 'Plants in database'], ['4.9★', 'Average rating'], ['98%', 'Survival rate'], ['0 waste', 'From our bouquets']].map(([n, l], i, arr) => (
               <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
@@ -240,18 +253,16 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Trust strip pinned to bottom */}
+        {/* Trust strip pinned to the very bottom of the hero */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 2 }}>
           <TrustStrip />
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          PAGE 2 — TWO COLUMNS (Home & Commercial)
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 2: HOME vs COMMERCIAL SPLIT ──────────────────────────── */}
       <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '100vh', gap: '16px', padding: '16px', background: '#FAF3E1' }}>
 
-        {/* LEFT — For Your Home */}
+        {/* Left card — for home buyers */}
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px' }}>
           <img src={cm1} alt="home" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,20,10,0.95) 35%, rgba(10,20,10,0.45) 70%, rgba(10,20,10,0.15) 100%)' }} />
@@ -280,7 +291,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* RIGHT — For Commercials */}
+        {/* Right card — for commercial (cafe/office toggle) */}
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', boxShadow: '0 24px 60px rgba(26,46,26,0.18)' }}>
           <img
             src={activeProject === 'cafe' ? cm1 : cm2}
@@ -289,7 +300,7 @@ const Home = () => {
           />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,20,10,0.95) 35%, rgba(10,20,10,0.45) 70%, rgba(10,20,10,0.15) 100%)' }} />
 
-          {/* Toggle pill */}
+          {/* Pill toggle to switch between cafe and office view */}
           <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 2, display: 'flex', gap: '4px', padding: '4px', borderRadius: '50px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}>
             {['cafe', 'office'].map(type => (
               <button key={type} onClick={() => setActiveProject(type)}
@@ -316,7 +327,7 @@ const Home = () => {
               ))}
             </div>
 
-            {/* Stats */}
+            {/* Stats change based on active toggle (cafe vs office) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '28px' }}>
               {(activeProject === 'cafe'
                 ? [{ v: '85',  l: 'Plants managed' }, { v: '100%', l: 'Coverage' }, { v: '12mo', l: 'Duration' }]
@@ -338,12 +349,9 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          PAGE 3 — BESTSELLERS + SHOP BY CATEGORY
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 3: BESTSELLERS + SHOP BY CATEGORY ────────────────────── */}
       <section style={{ background: 'var(--text-hero)', padding: '40px 0' }}>
 
-        {/* Bestsellers header */}
         <div style={{ padding: '0 60px', marginBottom: '20px' }}>
           <p style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--soft-leaf)', marginBottom: '6px' }}>Top picks</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -352,12 +360,14 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Auto-scrolling bestsellers */}
+        {/* Auto-scrolling product row — pauses on hover */}
         <div style={{ overflow: 'hidden', position: 'relative', padding: '4px 0', marginBottom: '32px' }}>
+          {/* Left/right fade masks to hide the scroll edge */}
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(to right, var(--text-hero), transparent)', zIndex: 2, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(to left, var(--text-hero), transparent)', zIndex: 2, pointerEvents: 'none' }} />
 
           <div id="best-scroll" style={{ display: 'flex', gap: '14px', animation: 'bestScroll 32s linear infinite', width: 'max-content', paddingLeft: '60px' }}>
+            {/* Duplicate array so the scroll looks seamless/infinite */}
             {[...BESTSELLERS, ...BESTSELLERS].map((p, i) => (
               <div key={i}
                 style={{ flexShrink: 0, width: '220px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.25s ease, box-shadow 0.25s ease' }}
@@ -376,7 +386,7 @@ const Home = () => {
                 <div style={{ position: 'relative', height: '160px', background: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
                   <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />
                   {p.discount && <span style={{ position: 'absolute', top: '8px', left: '8px', background: 'var(--accent)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 9px', borderRadius: '50px' }}>{p.discount}</span>}
-                  {p.badge && <span style={{ position: 'absolute', top: '8px', right: '8px', background: '#fef3c7', color: '#92400e', fontSize: '9px', fontWeight: '700', padding: '2px 9px', borderRadius: '50px' }}>{p.badge}</span>}
+                  {p.badge   && <span style={{ position: 'absolute', top: '8px', right: '8px', background: '#fef3c7', color: '#92400e', fontSize: '9px', fontWeight: '700', padding: '2px 9px', borderRadius: '50px' }}>{p.badge}</span>}
                 </div>
                 <div style={{ padding: '12px 14px' }}>
                   <div style={{ fontSize: '9px', fontWeight: '700', color: 'var(--soft-leaf)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '3px' }}>{p.category}</div>
@@ -390,6 +400,7 @@ const Home = () => {
                       <span style={{ fontSize: '15px', fontWeight: '700', color: '#fff' }}>₹{p.price}</span>
                       {p.originalPrice && <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', textDecoration: 'line-through', marginLeft: '5px' }}>₹{p.originalPrice}</span>}
                     </div>
+                    {/* Add to cart button — shows a checkmark for 1.5s on click */}
                     <button
                       onClick={e => {
                         e.stopPropagation()
@@ -410,10 +421,8 @@ const Home = () => {
           <style>{`@keyframes bestScroll { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }`}</style>
         </div>
 
-        {/* Divider */}
         <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '0 60px 32px' }} />
 
-        {/* Category header */}
         <div style={{ padding: '0 60px', marginBottom: '20px' }}>
           <p style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--soft-leaf)', marginBottom: '6px' }}>Browse collections</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -422,7 +431,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Category circles */}
+        {/* Category icon circles */}
         <div style={{ overflow: 'hidden', position: 'relative', padding: '4px 0' }}>
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(to right, var(--text-hero), transparent)', zIndex: 2, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(to left, var(--text-hero), transparent)', zIndex: 2, pointerEvents: 'none' }} />
@@ -454,9 +463,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          PAGE 4 — HOW IT WORKS
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 4: HOW IT WORKS ───────────────────────────────────────── */}
       <section style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 60px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 40px 40px', overflow: 'hidden' }}>
 
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
@@ -466,9 +473,10 @@ const Home = () => {
           </h2>
         </div>
 
+        {/* Steps alternate top/bottom text; connectors animate between them */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0', width: '100%', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
           {HOW_STEPS.map((step, i) => {
-            const isTop = i % 2 !== 0   // Steps 2, 4 go top; 1, 3, 5 go bottom
+            const isTop = i % 2 !== 0  // odd-index steps show label above the circle
             const isLast = i === HOW_STEPS.length - 1
             const circleStyle = {
               width: '180px', height: '180px', borderRadius: '50%', overflow: 'hidden',
@@ -488,6 +496,7 @@ const Home = () => {
                   )}
                   {!isTop && <div style={{ height: '80px' }} />}
 
+                  {/* Step circle with background image, dark overlay and step number */}
                   <div style={circleStyle}>
                     <img src={step.img} alt={step.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,20,10,0.52)' }} />
@@ -506,7 +515,6 @@ const Home = () => {
                   {isTop && <div style={{ height: '80px' }} />}
                 </div>
 
-                {/* Connector between steps */}
                 {!isLast && (
                   <StepConnector key={`conn-${i}`} id={i + 1} direction={isTop ? 'down' : 'up'} />
                 )}
@@ -514,7 +522,7 @@ const Home = () => {
             )
           })}
 
-          {/* Final straight arrow to outcome */}
+          {/* Final straight arrow pointing to the outcome cards */}
           <div style={{ flexShrink: 0, width: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '80px' }}>
             <svg width="48" height="24" viewBox="0 0 48 24">
               <defs>
@@ -526,7 +534,7 @@ const Home = () => {
             </svg>
           </div>
 
-          {/* Outcome cards */}
+          {/* Free plan vs Premium plan outcome cards */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0, marginBottom: '80px' }}>
             <div style={{ width: '148px', background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: '16px', padding: '14px', boxShadow: '0 8px 24px rgba(26,46,26,0.1)' }}>
               <div style={{ fontSize: '18px', marginBottom: '6px' }}>🌱</div>
@@ -552,9 +560,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          PAGE 5 — GIFTING
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 5: GIFTING ───────────────────────────────────────────────*/}
       <div style={{ background: 'linear-gradient(160deg, #1c1f14 0%, #242b18 40%, #1a1f11 100%)', padding: '72px 60px', marginBottom: '0' }}>
 
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
@@ -567,6 +573,7 @@ const Home = () => {
           </p>
         </div>
 
+        {/* CSS-only gift card hover effects (spin border, float image, slide text) */}
         <style>{`
           .gift-wrap { display: flex; gap: 24px; justify-content: center; align-items: center; padding-bottom: 8px; }
           .g-card { position: relative; width: 256px; height: 360px; border-radius: 20px; z-index: 1; overflow: hidden; cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease; flex-shrink: 0; }
@@ -605,6 +612,7 @@ const Home = () => {
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 13px', borderRadius: '50px', background: 'rgba(255,255,255,0.1)', color: 'var(--soft-leaf)', fontSize: '11px', fontWeight: '600', border: '1px solid rgba(255,255,255,0.15)' }}>
                     {card.seed}
                   </span>
+                  {/* Extra details revealed on hover */}
                   <div className="g-extra">
                     <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.38)', marginTop: '8px', lineHeight: '1.6' }}>{card.extra}</p>
                   </div>
@@ -628,9 +636,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════
-          PAGE 6 — FAQ
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 6: FAQ ────────────────────────────────────────────────── */}
       <section style={{ background: 'var(--bg)', padding: '80px 60px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
@@ -641,6 +647,7 @@ const Home = () => {
             </h2>
           </div>
 
+          {/* Accordion — clicking a question toggles its answer open/closed */}
           {FAQS.map((faq, i) => (
             <div key={i} style={{ borderBottom: '1px solid var(--border)', overflow: 'hidden' }}>
               <button
@@ -649,6 +656,7 @@ const Home = () => {
                 <span style={{ fontSize: '16px', fontWeight: '600', color: openFaq === i ? 'var(--accent)' : 'var(--text-hero)', transition: 'color 0.2s ease', lineHeight: '1.4' }}>
                   {faq.q}
                 </span>
+                {/* + icon rotates to × when open */}
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: openFaq === i ? 'var(--accent)' : 'var(--pill)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s ease' }}>
                   <span style={{ fontSize: '18px', fontWeight: '300', color: openFaq === i ? '#fff' : 'var(--text-muted)', lineHeight: 1, transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0deg)', display: 'block', transition: 'transform 0.2s ease' }}>+</span>
                 </div>
@@ -663,12 +671,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          PAGE 7 — CTA + FOOTER
-      ══════════════════════════════════════════ */}
+      {/* ── SECTION 7: CTA + FOOTER ───────────────────────────────────────── */}
       <section style={{ background: 'linear-gradient(160deg, #1c1f14 0%, #242b18 40%, #1a1f11 100%)', position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
-        {/* Decorative background circles */}
+        {/* Decorative background blobs and rings — purely visual */}
         <div style={{ position: 'absolute', top: '-80px', left: '-80px', width: '450px', height: '450px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(127,176,105,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: '150px', right: '-60px', width: '350px', height: '350px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(58,125,68,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', top: '35%', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '250px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(201,219,178,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -676,7 +682,7 @@ const Home = () => {
         <div style={{ position: 'absolute', top: '20px', left: '5%', width: '220px', height: '220px', borderRadius: '50%', border: '1px solid rgba(201,219,178,0.03)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: '250px', right: '5%', width: '200px', height: '200px', borderRadius: '50%', border: '1px solid rgba(201,219,178,0.04)', pointerEvents: 'none' }} />
 
-        {/* CTA */}
+        {/* Final CTA */}
         <div style={{ padding: '52px 60px 40px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '5px 16px', borderRadius: '50px', background: 'rgba(201,219,178,0.08)', border: '1px solid rgba(201,219,178,0.15)', fontSize: '10px', fontWeight: '700', color: 'var(--soft-leaf)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '20px' }}>
             🌿 Start for free
@@ -716,14 +722,13 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div style={{ height: '1px', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent)', margin: '0 60px', position: 'relative', zIndex: 1 }} />
 
         {/* Footer */}
         <footer style={{ padding: '36px 60px 24px', position: 'relative', zIndex: 1, flex: 1 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', marginBottom: '28px' }}>
 
-            {/* Brand */}
+            {/* Brand column with social icons */}
             <div>
               <div style={{ fontFamily: "'Playfair Display',serif", fontSize: '22px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>
                 Gree<span style={{ color: 'var(--soft-leaf)' }}>Looker</span>
@@ -748,7 +753,7 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Pages */}
+            {/* Pages nav links */}
             <div>
               <div style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.22)', marginBottom: '14px' }}>Pages</div>
               {[['Home', '/'], ['Recommend', '/recommend'], ['Gifting', '/gifting'], ['Commercials', '/commercials'], ['Accessories', '/accessories']].map(([n, p]) => (
@@ -761,7 +766,7 @@ const Home = () => {
               ))}
             </div>
 
-            {/* Account */}
+            {/* Account nav links */}
             <div>
               <div style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.22)', marginBottom: '14px' }}>Account</div>
               {[['Login', '/login'], ['Register', '/register'], ['Dashboard', '/dashboard'], ['My Plants', '/myplants'], ['Settings', '/settings']].map(([n, p]) => (
@@ -774,7 +779,7 @@ const Home = () => {
               ))}
             </div>
 
-            {/* Support */}
+            {/* Support links */}
             <div>
               <div style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.22)', marginBottom: '14px' }}>Support</div>
               {[['Contact Us', '#'], ['Track Order', '#'], ['Return Policy', '#'], ['Privacy Policy', '#'], ['Terms of Service', '#']].map(([n, p]) => (
@@ -788,7 +793,7 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Bottom bar */}
+          {/* Bottom bar — copyright and utility links */}
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
             <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.18)' }}>
               © {new Date().getFullYear()} GreeLooker. All rights reserved.

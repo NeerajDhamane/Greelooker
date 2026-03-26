@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
+/* VARIABLES */
 :root {
-  --bg:         #FAF3E1;
-  --surface:    #FFFDF1;
-  --border:     #E2E8CE;
-  --pill:       #edf0e0;
-  --text-hero:  #1a2e1a;
-  --text-body:  #3d4f2e;
+  --bg: #FAF3E1;
+  --surface: #FFFDF1;
+  --border: #E2E8CE;
+  --pill: #edf0e0;
+
+  --text-hero: #1a2e1a;
+  --text-body: #3d4f2e;
   --text-muted: #6b7c5c;
-  --accent:     #3a7d44;
-  --leaf:       #7fb069;
-  --soft-leaf:  #c9dbb2;
+
+  --accent: #3a7d44;
+  --leaf: #7fb069;
+  --soft-leaf: #c9dbb2;
 }
 
+/* BASE */
 body {
   background-color: var(--bg);
   color: var(--text-body);
   font-family: 'DM Sans', sans-serif;
 }
 
+/* NAV LINK */
 .nav-link {
   position: relative;
   transition: color 0.2s ease;
@@ -29,8 +34,10 @@ body {
   position: absolute;
   bottom: -2px;
   left: 0;
+
   width: 0%;
   height: 2px;
+
   background: var(--accent);
   transition: width 0.25s ease;
 }
@@ -47,28 +54,62 @@ body {
   width: 100%;
 }
 
+/* FLOAT ANIMATIONS */
 @keyframes floatA {
-  0%,100% { transform: translateY(0px) rotate(0deg); }
-  50%      { transform: translateY(-18px) rotate(2deg); }
-}
-@keyframes floatB {
-  0%,100% { transform: translateY(0px) rotate(0deg); }
-  50%      { transform: translateY(-14px) rotate(-2deg); }
-}
-@keyframes floatC {
-  0%,100% { transform: translateY(0px); }
-  50%      { transform: translateY(-20px); }
-}
-@keyframes floatD {
-  0%,100% { transform: translateY(0px) rotate(0deg); }
-  50%      { transform: translateY(-10px) rotate(3deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotate(2deg);
+  }
 }
 
+@keyframes floatB {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-14px) rotate(-2deg);
+  }
+}
+
+@keyframes floatC {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes floatD {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+/* FLOATING ELEMENT */
 .plant-el {
   position: absolute;
   pointer-events: none;
   overflow: hidden;
   border-radius: 50%;
+
   -webkit-mask-image: radial-gradient(circle, black 40%, transparent 70%);
   mask-image: radial-gradient(circle, black 40%, transparent 70%);
 }
