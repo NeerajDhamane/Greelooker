@@ -1,13 +1,82 @@
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
 
-// ── QUOTE FORM MODAL ──
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+// Content for each business segment tab (headline, stats, features, image)
+const segments = {
+  'Cafes & Restaurants': {
+    headline: 'Turn your café into a living, breathing space',
+    sub: 'Plants increase dwell time by up to 30%. Customers stay longer, spend more, and come back for the ambience.',
+    img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
+    stats: [{ n:'30%', l:'Longer dwell time' }, { n:'4.2×', l:'More Instagram shares' }, { n:'22%', l:'Higher avg spend' }],
+    features: ['Curated plant selection for your café aesthetic','Monthly maintenance visits','Seasonal plant rotation','Pest & disease management','Dedicated plant care expert'],
+  },
+  'Offices & Coworking': {
+    headline: 'Boost focus and wellbeing in your workspace',
+    sub: 'Biophilic offices see 15% higher productivity and 6% higher creativity. Your team deserves to breathe better.',
+    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+    stats: [{ n:'15%', l:'Productivity increase' }, { n:'6%', l:'Creativity boost' }, { n:'60%', l:'Reduced sick leaves' }],
+    features: ['Desk plants for every team member','Air purifying plants for meeting rooms','Reception & lobby installations','Biweekly watering & maintenance','Slack/WhatsApp care reminders'],
+  },
+  'Hotels & Resorts': {
+    headline: 'Craft unforgettable first impressions with greenery',
+    sub: 'From lobbies to suites — a green hotel scores higher on reviews. Guests associate plants with luxury and calm.',
+    img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',
+    stats: [{ n:'+0.8', l:'Star rating improvement' }, { n:'40%', l:'Better review scores' }, { n:'3×', l:'Guest photo mentions' }],
+    features: ['Lobby & atrium statement plants','Suite & room plant packages','Restaurant & bar green walls','Pool & spa tropical arrangements','Full-time on-site plant manager (premium)'],
+  },
+}
+
+// Pricing tier cards — highlight flag controls dark background styling
+const plans = [
+  {
+    name: 'Starter',
+    price: '₹2,999',
+    period: '/month',
+    desc: 'Perfect for small cafés, boutiques or startups just getting started with greening.',
+    features: ['Up to 10 plants','Monthly maintenance visit','Basic plant selection','Email support','Replacement guarantee'],
+    cta: 'Get Started',
+    highlight: false,
+  },
+  {
+    name: 'Growth',
+    price: '₹6,999',
+    period: '/month',
+    desc: 'Our most popular plan for growing businesses who want a serious green transformation.',
+    features: ['Up to 30 plants','Biweekly maintenance','Custom design consultation','Priority WhatsApp support','Seasonal rotation','Pest & disease cover'],
+    cta: 'Most Popular',
+    highlight: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: 'pricing',
+    desc: 'For large offices, hotel chains and commercial properties with custom requirements.',
+    features: ['Unlimited plants','Weekly maintenance','Dedicated plant manager','24/7 support','Green wall installations','Staff plant care training'],
+    cta: 'Talk to Us',
+    highlight: false,
+  },
+]
+
+// Client testimonial cards
+const testimonials = [
+  { name:'Priya Mehta',   role:'Owner, The Brew Room Café · Mumbai',          quote:'GreeLooker completely transformed our space. Customers literally stop to take photos now. Our Instagram engagement went up 3x in 2 months.',   avatar:'P' },
+  { name:'Rohit Sharma',  role:'Facilities Head, NestWork Coworking · Bangalore', quote:'The team handled everything — design, installation, maintenance. Zero effort from our side. Our members love the vibe now.',                avatar:'R' },
+  { name:'Aisha Kapoor',  role:'GM, The Palm Resort · Goa',                   quote:'Our lobby reviews went from "nice hotel" to "absolutely stunning". Plants made the difference. GreeLooker is our go-to partner.',               avatar:'A' },
+]
+
+// ── SUB-COMPONENTS ────────────────────────────────────────────────────────────
+
+// Popup modal with a lead capture form — shows success state after submit
 const QuoteModal = ({ onClose }) => {
-  const [form, setForm] = useState({ name:'', business:'', segment:'', size:'', city:'', phone:'', message:'' })
+  const [form, setForm]           = useState({ name:'', business:'', segment:'', size:'', city:'', phone:'', message:'' })
   const [submitted, setSubmitted] = useState(false)
 
+  // Helper to update a single field in the form state
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
+  // Basic validation — requires name, phone and segment before submitting
   const submit = () => {
     if (!form.name || !form.phone || !form.segment) return
     setSubmitted(true)
@@ -15,9 +84,12 @@ const QuoteModal = ({ onClose }) => {
 
   return (
     <>
+      {/* Blurred backdrop — clicking it closes the modal */}
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:99, backdropFilter:'blur(3px)' }} />
+
       <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'520px', maxWidth:'90vw', maxHeight:'90vh', overflowY:'auto', background:'#fff', borderRadius:'28px', zIndex:100, boxShadow:'0 24px 64px rgba(26,46,26,0.2)', padding:'40px' }}>
 
+        {/* Success state shown after form submission */}
         {submitted ? (
           <div style={{ textAlign:'center', padding:'24px 0' }}>
             <div style={{ fontSize:'48px', marginBottom:'16px' }}>🌿</div>
@@ -54,6 +126,7 @@ const QuoteModal = ({ onClose }) => {
                 </div>
               </div>
 
+              {/* Business type — pill toggle buttons instead of a dropdown */}
               <div>
                 <label style={{ fontSize:'12px', fontWeight:'600', color:'var(--text-muted)', display:'block', marginBottom:'6px' }}>Business Type *</label>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
@@ -80,6 +153,7 @@ const QuoteModal = ({ onClose }) => {
 
               <div>
                 <label style={{ fontSize:'12px', fontWeight:'600', color:'var(--text-muted)', display:'block', marginBottom:'6px' }}>Phone Number *</label>
+                {/* Country code prefix displayed as a static label next to the input */}
                 <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
                   <span style={{ padding:'10px 14px', borderRadius:'12px', border:'1.5px solid var(--border)', fontSize:'13px', color:'var(--text-muted)', background:'var(--pill)', flexShrink:0 }}>🇮🇳 +91</span>
                   <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="9876543210" type="tel" maxLength={10}
@@ -107,79 +181,20 @@ const QuoteModal = ({ onClose }) => {
   )
 }
 
-// ── MAIN PAGE ──
+// ── MAIN COMPONENT ────────────────────────────────────────────────────────────
+
 const Commercials = () => {
-  const [quoteOpen, setQuoteOpen]       = useState(false)
-  const [activeSegment, setActiveSegment] = useState('Cafes & Restaurants')
-  const [activePlan, setActivePlan]     = useState('Growth')
-
-  const segments = {
-    'Cafes & Restaurants': {
-      headline: 'Turn your café into a living, breathing space',
-      sub: 'Plants increase dwell time by up to 30%. Customers stay longer, spend more, and come back for the ambience.',
-      img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
-      stats: [{ n:'30%', l:'Longer dwell time' },{ n:'4.2×', l:'More Instagram shares' },{ n:'22%', l:'Higher avg spend' }],
-      features: ['Curated plant selection for your café aesthetic','Monthly maintenance visits','Seasonal plant rotation','Pest & disease management','Dedicated plant care expert'],
-    },
-    'Offices & Coworking': {
-      headline: 'Boost focus and wellbeing in your workspace',
-      sub: 'Biophilic offices see 15% higher productivity and 6% higher creativity. Your team deserves to breathe better.',
-      img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-      stats: [{ n:'15%', l:'Productivity increase' },{ n:'6%', l:'Creativity boost' },{ n:'60%', l:'Reduced sick leaves' }],
-      features: ['Desk plants for every team member','Air purifying plants for meeting rooms','Reception & lobby installations','Biweekly watering & maintenance','Slack/WhatsApp care reminders'],
-    },
-    'Hotels & Resorts': {
-      headline: 'Craft unforgettable first impressions with greenery',
-      sub: 'From lobbies to suites — a green hotel scores higher on reviews. Guests associate plants with luxury and calm.',
-      img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80',
-      stats: [{ n:'+0.8', l:'Star rating improvement' },{ n:'40%', l:'Better review scores' },{ n:'3×', l:'Guest photo mentions' }],
-      features: ['Lobby & atrium statement plants','Suite & room plant packages','Restaurant & bar green walls','Pool & spa tropical arrangements','Full-time on-site plant manager (premium)'],
-    },
-  }
-
-  const plans = [
-    {
-      name:'Starter',
-      price:'₹2,999',
-      period:'/month',
-      desc:'Perfect for small cafés, boutiques or startups just getting started with greening.',
-      features:['Up to 10 plants','Monthly maintenance visit','Basic plant selection','Email support','Replacement guarantee'],
-      cta:'Get Started',
-      highlight: false,
-    },
-    {
-      name:'Growth',
-      price:'₹6,999',
-      period:'/month',
-      desc:'Our most popular plan for growing businesses who want a serious green transformation.',
-      features:['Up to 30 plants','Biweekly maintenance','Custom design consultation','Priority WhatsApp support','Seasonal rotation','Pest & disease cover'],
-      cta:'Most Popular',
-      highlight: true,
-    },
-    {
-      name:'Enterprise',
-      price:'Custom',
-      period:'pricing',
-      desc:'For large offices, hotel chains and commercial properties with custom requirements.',
-      features:['Unlimited plants','Weekly maintenance','Dedicated plant manager','24/7 support','Green wall installations','Staff plant care training'],
-      cta:'Talk to Us',
-      highlight: false,
-    },
-  ]
-
-  const testimonials = [
-    { name:'Priya Mehta', role:'Owner, The Brew Room Café · Mumbai', quote:'GreeLooker completely transformed our space. Customers literally stop to take photos now. Our Instagram engagement went up 3x in 2 months.', avatar:'P' },
-    { name:'Rohit Sharma', role:'Facilities Head, NestWork Coworking · Bangalore', quote:'The team handled everything — design, installation, maintenance. Zero effort from our side. Our members love the vibe now.', avatar:'R' },
-    { name:'Aisha Kapoor', role:'GM, The Palm Resort · Goa', quote:'Our lobby reviews went from "nice hotel" to "absolutely stunning". Plants made the difference. GreeLooker is our go-to partner.', avatar:'A' },
-  ]
+  const [quoteOpen, setQuoteOpen]         = useState(false)           // controls quote modal visibility
+  const [activeSegment, setActiveSegment] = useState('Cafes & Restaurants') // selected segment tab
+  const [activePlan, setActivePlan]       = useState('Growth')        // selected pricing card
 
   return (
     <div style={{ background:'var(--bg)', minHeight:'100vh' }}>
 
-      {/* ── HERO ── */}
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <div style={{ background:'var(--text-hero)', minHeight:'100vh', display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
 
-        {/* Navbar on dark bg */}
+        {/* Inline navbar — dark version for this page only */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'24px 60px', position:'relative', zIndex:10 }}>
           <span style={{ fontFamily:"'Playfair Display',serif", fontSize:'22px', fontWeight:'700', color:'#fff' }}>
             Gree<span style={{ color:'var(--soft-leaf)' }}>Looker</span>
@@ -193,7 +208,7 @@ const Commercials = () => {
           </div>
         </div>
 
-        {/* Hero content */}
+        {/* Hero text and CTA buttons */}
         <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', textAlign:'center', padding:'60px 40px', position:'relative', zIndex:10 }}>
           <span style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--soft-leaf)', marginBottom:'20px', display:'block' }}>
             🌿 Commercial Green Spaces
@@ -214,7 +229,7 @@ const Commercials = () => {
             </a>
           </div>
 
-          {/* Trust bar */}
+          {/* Key stats row */}
           <div style={{ display:'flex', gap:'40px', marginTop:'64px', flexWrap:'wrap', justifyContent:'center' }}>
             {[['500+','Plants installed'],['50+','Business clients'],['4.9★','Average rating'],['0','Plants lost to neglect']].map(([n, l]) => (
               <div key={l} style={{ textAlign:'center' }}>
@@ -225,13 +240,13 @@ const Commercials = () => {
           </div>
         </div>
 
-        {/* Decorative circles */}
+        {/* Decorative ring circles — purely visual */}
         <div style={{ position:'absolute', top:'-100px', right:'-100px', width:'500px', height:'500px', borderRadius:'50%', border:'1px solid rgba(255,255,255,0.04)', pointerEvents:'none' }} />
         <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'360px', height:'360px', borderRadius:'50%', border:'1px solid rgba(255,255,255,0.06)', pointerEvents:'none' }} />
         <div style={{ position:'absolute', bottom:'-80px', left:'-80px', width:'400px', height:'400px', borderRadius:'50%', border:'1px solid rgba(255,255,255,0.04)', pointerEvents:'none' }} />
       </div>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
       <div id="how-it-works" style={{ padding:'80px 60px', background:'#fff' }}>
         <div style={{ textAlign:'center', marginBottom:'56px' }}>
           <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--accent)', marginBottom:'12px' }}>Simple Process</p>
@@ -253,14 +268,14 @@ const Commercials = () => {
         </div>
       </div>
 
-      {/* ── SEGMENT SHOWCASE ── */}
+      {/* ── SEGMENT SHOWCASE ──────────────────────────────────────────────── */}
       <div style={{ padding:'80px 60px', background:'var(--bg)' }}>
         <div style={{ textAlign:'center', marginBottom:'40px' }}>
           <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--accent)', marginBottom:'12px' }}>We serve</p>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:'36px', color:'var(--text-hero)' }}>Built for every commercial space</h2>
         </div>
 
-        {/* Segment tabs */}
+        {/* Tab pills to switch between segment views */}
         <div style={{ display:'flex', justifyContent:'center', gap:'8px', marginBottom:'48px' }}>
           {Object.keys(segments).map(s => (
             <button key={s} onClick={() => setActiveSegment(s)} style={{ padding:'10px 24px', borderRadius:'50px', border: activeSegment === s ? '1.5px solid var(--accent)' : '1.5px solid var(--border)', background: activeSegment === s ? 'var(--pill)' : '#fff', color: activeSegment === s ? 'var(--accent)' : 'var(--text-muted)', fontSize:'14px', fontWeight: activeSegment === s ? '600' : '500', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
@@ -269,7 +284,7 @@ const Commercials = () => {
           ))}
         </div>
 
-        {/* Segment content */}
+        {/* Render the active segment content (IIFE keeps this inline) */}
         {(() => {
           const seg = segments[activeSegment]
           return (
@@ -281,7 +296,7 @@ const Commercials = () => {
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:'28px', color:'var(--text-hero)', marginBottom:'16px', lineHeight:'1.3' }}>{seg.headline}</h3>
                 <p style={{ fontSize:'14px', color:'var(--text-muted)', lineHeight:'1.8', marginBottom:'28px' }}>{seg.sub}</p>
 
-                {/* Stats */}
+                {/* Stat tiles */}
                 <div style={{ display:'flex', gap:'20px', marginBottom:'28px' }}>
                   {seg.stats.map(st => (
                     <div key={st.l} style={{ textAlign:'center', padding:'16px 20px', borderRadius:'16px', background:'var(--text-hero)', flex:1 }}>
@@ -291,7 +306,7 @@ const Commercials = () => {
                   ))}
                 </div>
 
-                {/* Features */}
+                {/* Feature checklist */}
                 <div style={{ display:'flex', flexDirection:'column', gap:'8px', marginBottom:'32px' }}>
                   {seg.features.map(f => (
                     <div key={f} style={{ display:'flex', alignItems:'center', gap:'10px', fontSize:'13px', color:'var(--text-body)' }}>
@@ -310,7 +325,7 @@ const Commercials = () => {
         })()}
       </div>
 
-      {/* ── PRICING ── */}
+      {/* ── PRICING ───────────────────────────────────────────────────────── */}
       <div style={{ padding:'80px 60px', background:'#fff' }}>
         <div style={{ textAlign:'center', marginBottom:'56px' }}>
           <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--accent)', marginBottom:'12px' }}>Transparent Pricing</p>
@@ -320,9 +335,11 @@ const Commercials = () => {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'24px', maxWidth:'960px', margin:'0 auto' }}>
           {plans.map(plan => (
+            // Clicking a card lifts it up via translateY on activePlan match
             <div key={plan.name} onClick={() => setActivePlan(plan.name)}
               style={{ padding:'32px 28px', borderRadius:'24px', border: plan.highlight ? '2px solid var(--accent)' : '1.5px solid var(--border)', background: plan.highlight ? 'var(--text-hero)' : '#fff', cursor:'pointer', position:'relative', transition:'transform 0.2s', transform: activePlan === plan.name ? 'translateY(-4px)' : 'none' }}>
 
+              {/* "Most Popular" floating label above highlighted card */}
               {plan.highlight && (
                 <span style={{ position:'absolute', top:'-12px', left:'50%', transform:'translateX(-50%)', fontSize:'11px', fontWeight:'700', padding:'4px 16px', borderRadius:'50px', background:'var(--accent)', color:'#fff', whiteSpace:'nowrap' }}>
                   Most Popular
@@ -336,6 +353,7 @@ const Commercials = () => {
               </div>
               <p style={{ fontSize:'12px', color: plan.highlight ? 'rgba(255,255,255,0.5)' : 'var(--text-muted)', lineHeight:'1.6', marginBottom:'24px' }}>{plan.desc}</p>
 
+              {/* Feature list */}
               <div style={{ display:'flex', flexDirection:'column', gap:'8px', marginBottom:'28px' }}>
                 {plan.features.map(f => (
                   <div key={f} style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'13px', color: plan.highlight ? 'rgba(255,255,255,0.75)' : 'var(--text-body)' }}>
@@ -353,7 +371,7 @@ const Commercials = () => {
         </div>
       </div>
 
-      {/* ── TESTIMONIALS ── */}
+      {/* ── TESTIMONIALS ─────────────────────────────────────────────────── */}
       <div style={{ padding:'80px 60px', background:'var(--bg)' }}>
         <div style={{ textAlign:'center', marginBottom:'56px' }}>
           <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--accent)', marginBottom:'12px' }}>What our clients say</p>
@@ -365,6 +383,7 @@ const Commercials = () => {
             <div key={t.name} style={{ padding:'28px', borderRadius:'24px', background:'#fff', border:'1.5px solid var(--border)' }}>
               <div style={{ fontSize:'24px', color:'var(--accent)', marginBottom:'16px', fontFamily:'serif' }}>"</div>
               <p style={{ fontSize:'13px', color:'var(--text-body)', lineHeight:'1.8', marginBottom:'20px', fontStyle:'italic' }}>{t.quote}</p>
+              {/* Avatar uses first letter of name as a coloured circle */}
               <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
                 <div style={{ width:'36px', height:'36px', borderRadius:'50%', background:'var(--accent)', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'700', fontSize:'14px', flexShrink:0 }}>{t.avatar}</div>
                 <div>
@@ -377,7 +396,7 @@ const Commercials = () => {
         </div>
       </div>
 
-      {/* ── BOTTOM CTA ── */}
+      {/* ── BOTTOM CTA ────────────────────────────────────────────────────── */}
       <div style={{ padding:'80px 60px', background:'var(--text-hero)', textAlign:'center' }}>
         <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:'40px', color:'#fff', marginBottom:'16px' }}>
           Ready to go green?
@@ -390,7 +409,7 @@ const Commercials = () => {
         </button>
       </div>
 
-      {/* Quote modal */}
+      {/* Quote modal — only rendered when open */}
       {quoteOpen && <QuoteModal onClose={() => setQuoteOpen(false)} />}
 
     </div>
