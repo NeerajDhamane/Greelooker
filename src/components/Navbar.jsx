@@ -10,6 +10,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [visible, setVisible] = useState(true)
   const [lastScroll, setLastScroll] = useState(0)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const { user } = useAuth()
 
   useEffect(() => {
@@ -81,81 +82,123 @@ const Navbar = () => {
 
   // ── sticky navbar — home only ──
   return (
-    <nav style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      background: 'var(--surface)',
-      borderBottom: '1.5px solid var(--border)',
-      borderRadius: '0 0 16px 16px',
-      padding: '0 32px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: '60px',
-      boxShadow: '0 2px 12px rgba(26,46,26,0.06)',
-      transform: visible ? 'translateY(0)' : 'translateY(-110%)',
-      transition: 'transform 0.3s ease',
-    }}>
+    <>
+      <nav style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        background: 'var(--surface)',
+        borderBottom: '1.5px solid var(--border)',
+        borderRadius: '0 0 16px 16px',
+        padding: '0 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: '60px',
+        boxShadow: '0 2px 12px rgba(26,46,26,0.06)',
+        transform: visible ? 'translateY(0)' : 'translateY(-110%)',
+        transition: 'transform 0.3s ease',
+      }}>
 
-      <Link to="/" className="no-underline flex-shrink-0"
-        style={{ fontFamily:"'Playfair Display', serif", fontWeight:'700', fontSize:'18px', color:'var(--text-hero)' }}>
-        GreeLooker
-      </Link>
+        <Link to="/" className="no-underline flex-shrink-0"
+          style={{ fontFamily:"'Playfair Display', serif", fontWeight:'700', fontSize:'18px', color:'var(--text-hero)' }}>
+          GreeLooker
+        </Link>
 
-      <div className="flex items-center gap-1">
-        {NAV_LINKS.map((link) => (
-          <Link key={link.path} to={link.path}
-            className="no-underline px-4 py-2 text-sm"
-            style={{ position:'relative', color: isActive(link.path) ? 'var(--accent)' : 'var(--text-muted)', fontWeight: isActive(link.path) ? '600' : '500', display:'inline-flex', flexDirection:'column', alignItems:'center', gap:'2px', transition:'color 0.2s ease' }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = 'var(--accent)'
-              e.currentTarget.querySelector('.underline-bar').style.width = '100%'
-            }}
-            onMouseLeave={e => {
-              if (!isActive(link.path)) e.currentTarget.style.color = 'var(--text-muted)'
-              if (!isActive(link.path)) e.currentTarget.querySelector('.underline-bar').style.width = '0%'
-            }}>
-            <span style={{ display:'inline-block', position:'relative' }}>
-              {link.name}
-              <span className="underline-bar" style={{ position:'absolute', bottom:'-2px', left:'0', width: isActive(link.path) ? '100%' : '0%', height:'2px', background:'var(--accent)', borderRadius:'2px', transition:'width 0.25s ease', display:'block' }} />
-            </span>
-          </Link>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {user ? (
-          <>
-            <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:'var(--accent)', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'700', fontSize:'13px', flexShrink:0, border:'2px solid var(--border)' }}>
-              {user.name?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <Link to="/dashboard" className="no-underline">
-              <button className="text-sm font-semibold px-5 py-2 rounded-full cursor-pointer"
-                style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
-                Dashboard ›
-              </button>
+        {/* Desktop links — hidden on mobile */}
+        <div className="hidden md:flex items-center gap-1">
+          {NAV_LINKS.map((link) => (
+            <Link key={link.path} to={link.path}
+              className="no-underline px-4 py-2 text-sm"
+              style={{ position:'relative', color: isActive(link.path) ? 'var(--accent)' : 'var(--text-muted)', fontWeight: isActive(link.path) ? '600' : '500', display:'inline-flex', flexDirection:'column', alignItems:'center', gap:'2px', transition:'color 0.2s ease' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = 'var(--accent)'
+                e.currentTarget.querySelector('.underline-bar').style.width = '100%'
+              }}
+              onMouseLeave={e => {
+                if (!isActive(link.path)) e.currentTarget.style.color = 'var(--text-muted)'
+                if (!isActive(link.path)) e.currentTarget.querySelector('.underline-bar').style.width = '0%'
+              }}>
+              <span style={{ display:'inline-block', position:'relative' }}>
+                {link.name}
+                <span className="underline-bar" style={{ position:'absolute', bottom:'-2px', left:'0', width: isActive(link.path) ? '100%' : '0%', height:'2px', background:'var(--accent)', borderRadius:'2px', transition:'width 0.25s ease', display:'block' }} />
+              </span>
             </Link>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="no-underline">
-              <button className="text-sm font-medium px-4 py-2 rounded-full cursor-pointer"
+          ))}
+        </div>
+
+        {/* Desktop auth buttons — hidden on mobile */}
+        <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+          {user ? (
+            <>
+              <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:'var(--accent)', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'700', fontSize:'13px', flexShrink:0, border:'2px solid var(--border)' }}>
+                {user.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <Link to="/dashboard" className="no-underline">
+                <button className="text-sm font-semibold px-5 py-2 rounded-full cursor-pointer"
+                  style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
+                  Dashboard ›
+                </button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="no-underline">
+                <button className="text-sm font-medium px-4 py-2 rounded-full cursor-pointer"
+                  style={{ color:'var(--text-body)', border:'1.5px solid var(--border)', background:'transparent' }}>
+                  Log in
+                </button>
+              </Link>
+              <Link to="/register" className="no-underline">
+                <button className="text-sm font-semibold px-5 py-2 rounded-full cursor-pointer flex items-center gap-1"
+                  style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
+                  Get started <span style={{ fontSize:'16px' }}>›</span>
+                </button>
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Hamburger — mobile only */}
+        <button className="flex md:hidden flex-col gap-1.5 cursor-pointer"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          style={{ background:'none', border:'none', padding:'4px' }}>
+          <span style={{ display:'block', width:'22px', height:'2px', background:'var(--text-hero)', borderRadius:'2px', transition:'all 0.3s', transform: mobileOpen ? 'rotate(45deg) translate(3px, 3px)' : 'none' }} />
+          <span style={{ display:'block', width:'22px', height:'2px', background:'var(--text-hero)', borderRadius:'2px', transition:'all 0.3s', opacity: mobileOpen ? 0 : 1 }} />
+          <span style={{ display:'block', width:'22px', height:'2px', background:'var(--text-hero)', borderRadius:'2px', transition:'all 0.3s', transform: mobileOpen ? 'rotate(-45deg) translate(3px, -3px)' : 'none' }} />
+        </button>
+
+      </nav>
+
+      {/* Mobile menu dropdown */}
+      {mobileOpen && (
+        <div className="flex md:hidden flex-col"
+          style={{ background:'var(--surface)', borderBottom:'1.5px solid var(--border)', zIndex:99, position:'sticky', top:'60px', boxShadow:'0 8px 24px rgba(26,46,26,0.08)' }}>
+          {NAV_LINKS.map(link => (
+            <Link key={link.path} to={link.path}
+              onClick={() => setMobileOpen(false)}
+              className="px-6 py-4 text-sm font-medium no-underline"
+              style={{ color: isActive(link.path) ? 'var(--accent)' : 'var(--text-body)', background: isActive(link.path) ? 'var(--pill)' : 'transparent', borderBottom:'1px solid var(--border)' }}>
+              {link.name}
+            </Link>
+          ))}
+          <div className="flex gap-3 p-4">
+            <Link to="/login" className="no-underline flex-1" onClick={() => setMobileOpen(false)}>
+              <button className="w-full py-3 rounded-full text-sm font-medium cursor-pointer"
                 style={{ color:'var(--text-body)', border:'1.5px solid var(--border)', background:'transparent' }}>
                 Log in
               </button>
             </Link>
-            <Link to="/register" className="no-underline">
-              <button className="text-sm font-semibold px-5 py-2 rounded-full cursor-pointer flex items-center gap-1"
+            <Link to="/register" className="no-underline flex-1" onClick={() => setMobileOpen(false)}>
+              <button className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer"
                 style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
-                Get started <span style={{ fontSize:'16px' }}>›</span>
+                Get started
               </button>
             </Link>
-          </>
-        )}
-      </div>
-
-    </nav>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
