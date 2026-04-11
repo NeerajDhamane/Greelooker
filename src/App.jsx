@@ -1,15 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Home from './pages/Home'
-import Login from './pages/Login'
-import Recommend from './pages/Recommend'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
+import Home        from './pages/Home'
+import Login       from './pages/Login'
+import Register    from './pages/Register'
+import Recommend   from './pages/Recommend'
+import Dashboard   from './pages/Dashboard'
 import Commercials from './pages/Commercials'
-import Gifting from './pages/Gifting'
+import Gifting     from './pages/Gifting'
 import Accessories from './pages/Accessories'
-import NotFound from './pages/NotFound'
-import Navbar from "./components/Navbar"
-import PrivateRoute from "./components/PrivateRoute"
+import Settings    from './pages/Settings'
+import MyPlants    from './pages/MyPlants'
+import NotFound    from './pages/NotFound'
+import Navbar      from './components/Navbar'
+import PrivateRoute from './components/PrivateRoute'
 import { AuthProvider } from './context/AuthContext'
 
 const App = () => {
@@ -18,20 +20,24 @@ const App = () => {
       <AuthProvider>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
+          {/* ── Public ── */}
+          <Route path="/"            element={<Home />} />
+          <Route path="/login"       element={<Login />} />
+          <Route path="/register"    element={<Register />} />
           <Route path="/commercials" element={<Commercials />} />
-          <Route path="/gifting" element={<Gifting />} />
+          <Route path="/gifting"     element={<Gifting />} />
           <Route path="/accessories" element={<Accessories />} />
 
-          {/* Protected routes — need login */}
+          {/* ── Protected ── */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/recommend" element={<PrivateRoute><Recommend /></PrivateRoute>} />
-          <Route path="/myplants" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/settings" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/myplants"  element={<PrivateRoute><MyPlants  /></PrivateRoute>} />
+          <Route path="/settings"  element={<PrivateRoute><Settings  /></PrivateRoute>} />
 
+          {/* ── 404 ── */}
           <Route path="*" element={<NotFound />} />
+
         </Routes>
       </AuthProvider>
     </BrowserRouter>
