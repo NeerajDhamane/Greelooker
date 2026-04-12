@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,11 +20,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isLoggedIn = localStorage.getItem('gl_user')
-    const is401      = error.response?.status === 401
+    const isLoggedIn  = localStorage.getItem('gl_user')
+    const is401       = error.response?.status === 401
     const isAuthRoute = error.config?.url?.includes('/auth/')
 
-    // Only force logout if logged in user gets 401 on a protected route
     if (is401 && isLoggedIn && !isAuthRoute) {
       localStorage.removeItem('gl_user')
       window.location.href = '/login'
