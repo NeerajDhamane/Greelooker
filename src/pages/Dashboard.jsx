@@ -1,27 +1,72 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { useAuth } from '../context/AuthContext'
+import api from '../api/api'
+
+const getHealthColor = (health) => {
+  if (health >= 85) return 'var(--accent)'
+  if (health >= 60) return '#f59e0b'
+  return '#ef4444'
+}
+
+const getCareText = (waterFreq) => {
+  if (!waterFreq) return '💧 Check schedule'
+  return `💧 ${waterFreq}`
+}
 
 const Dashboard = () => {
+  const { user } = useAuth()
   const [seasonalOpen, setSeasonalOpen] = useState(false)
-  const [seasonalTab, setSeasonalTab]   = useState('do')
-  const [isMobile, setIsMobile]         = useState(window.innerWidth <= 768)
+  const [seasonalTab,  setSeasonalTab]  = useState('do')
+  const [isMobile,     setIsMobile]     = useState(window.innerWidth <= 768)
+  const [plants,       setPlants]       = useState([])
+  const [loadingPlants, setLoadingPlants] = useState(true)
+  const [analysing,    setAnalysing]    = useState({})
+
   const [tasks, setTasks] = useState([
     { id:1, icon:'🌱', title:'Fertilise Pothos',  sub:'Kitchen · Next: 15 Mar',      badge:'weekly', badgeText:'Weekly', done:false },
     { id:2, icon:'☀️', title:'Rotate Areca Palm', sub:'Balcony · Next: 12 Mar',      badge:'daily',  badgeText:'3 days', done:false },
     { id:3, icon:'💧', title:'Water Monstera',    sub:'Living room · Next: Tomorrow', badge:'urgent', badgeText:'Daily',  done:false },
   ])
-  const [plants, setPlants] = useState([
-    { id:1, emoji:'🪴', name:'Monstera',   room:'Living room', health:90,  color:'var(--accent)', care:'💧 Next: Tomorrow', aiClass:'', aiText:'' },
-    { id:2, emoji:'🌵', name:'Cactus',     room:'Bedroom',     health:100, color:'var(--accent)', care:'✅ Next: 20 Mar',   aiClass:'', aiText:'' },
-    { id:3, emoji:'🌿', name:'Pothos',     room:'Kitchen',     health:75,  color:'#f59e0b',       care:'🌱 Next: 15 Mar',  aiClass:'', aiText:'' },
-    { id:4, emoji:'🌴', name:'Areca Palm', room:'Balcony',     health:95,  color:'var(--accent)', care:'☀️ Next: 12 Mar',  aiClass:'', aiText:'' },
-  ])
-  const [analysing, setAnalysing] = useState({})
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // ── Fetch user's plants from backend ─────────────────────────
+  useEffect(() => {
+    const fetchPlants = async () => {
+      try {
+        setLoadingPlants(true)
+        const res = await api.get('/plants/user-plants/me')
+        const mapped = res.data.map(p => ({
+          id:       p.id,
+          emoji:    p.emoji  || '🪴',
+          name:     p.name,
+          room:     p.room,
+          health:   p.health,
+          color:    getHealthColor(p.health),
+          care:     getCareText(p.water_freq),
+          aiClass:  '',
+          aiText:   '',
+        }))
+        setPlants(mapped)
+      } catch (err) {
+        console.error('Failed to fetch plants:', err)
+        // Fallback to mock data if API fails
+        setPlants([
+          { id:1, emoji:'🪴', name:'Monstera',   room:'Living room', health:90,  color:'var(--accent)', care:'💧 Next: Tomorrow', aiClass:'', aiText:'' },
+          { id:2, emoji:'🌵', name:'Cactus',     room:'Bedroom',     health:100, color:'var(--accent)', care:'✅ Next: 20 Mar',   aiClass:'', aiText:'' },
+          { id:3, emoji:'🌿', name:'Pothos',     room:'Kitchen',     health:75,  color:'#f59e0b',       care:'🌱 Next: 15 Mar',  aiClass:'', aiText:'' },
+          { id:4, emoji:'🌴', name:'Areca Palm', room:'Balcony',     health:95,  color:'var(--accent)', care:'☀️ Next: 12 Mar',  aiClass:'', aiText:'' },
+        ])
+      } finally {
+        setLoadingPlants(false)
+      }
+    }
+    fetchPlants()
   }, [])
 
   const now        = new Date()
@@ -43,7 +88,7 @@ const Dashboard = () => {
       4: { health:92,  color:'var(--accent)', aiClass:'good', aiText:'✅ Healthy. Consider rotating 90° for even growth.' },
     }
     setTimeout(() => {
-      const r = results[plantId]
+      const r = results[plantId] || { health:88, color:'var(--accent)', aiClass:'good', aiText:'✅ Looking healthy!' }
       setPlants(prev => prev.map(p => p.id === plantId ? { ...p, ...r } : p))
       setAnalysing(prev => ({ ...prev, [plantId]: false }))
     }, 1500)
@@ -51,6 +96,11 @@ const Dashboard = () => {
 
   const pendingTasks = tasks.filter(t => !t.done)
   const doneTasks    = tasks.filter(t =>  t.done)
+
+  // Greeting based on time
+  const hour = now.getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const userName = user?.name || 'there'
 
   return (
     <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'var(--bg)' }}>
@@ -66,7 +116,7 @@ const Dashboard = () => {
         {/* Greeting */}
         <div>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize: isMobile ? '22px' : '26px', fontWeight:'700', color:'var(--text-hero)', margin:0 }}>
-            Good morning, Arjun 🌿
+            {greeting}, {userName} 🌿
           </h1>
           <p style={{ fontSize:'13px', marginTop:'4px', color:'var(--text-muted)' }}>{dateString}</p>
         </div>
@@ -75,13 +125,9 @@ const Dashboard = () => {
         <div>
           <p style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--text-muted)', marginBottom:'12px' }}>🌦️ This month</p>
           <div style={{ borderRadius:'20px', overflow:'hidden', border:'1.5px solid var(--border)' }}>
-
-            {/* Header */}
             <div style={{ background:'var(--text-hero)', padding: isMobile ? '14px 16px' : '16px 24px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'12px' }}
               onClick={() => setSeasonalOpen(!seasonalOpen)}>
-
               {isMobile ? (
-                // Mobile — compact: just badge + title + arrow
                 <>
                   <div style={{ display:'flex', alignItems:'center', gap:'10px', flex:1, minWidth:0 }}>
                     <span style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--soft-leaf)', background:'rgba(201,219,178,0.1)', border:'1px solid rgba(201,219,178,0.2)', padding:'4px 10px', borderRadius:'50px', flexShrink:0 }}>
@@ -94,7 +140,6 @@ const Dashboard = () => {
                   <span style={{ color:'rgba(255,255,255,0.5)', fontSize:'12px', transition:'transform 0.3s', transform: seasonalOpen ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink:0 }}>▼</span>
                 </>
               ) : (
-                // Desktop — original full header
                 <>
                   <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
                     <span style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--soft-leaf)', background:'rgba(201,219,178,0.1)', border:'1px solid rgba(201,219,178,0.2)', padding:'5px 14px', borderRadius:'50px' }}>
@@ -116,12 +161,9 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Expanded content */}
             {seasonalOpen && (
               isMobile ? (
-                // Mobile — tabs
                 <div>
-                  {/* Tab bar */}
                   <div style={{ display:'flex', background:'var(--surface)', borderBottom:'1.5px solid var(--border)' }}>
                     {[['do','✅ Do this month'],['avoid','❌ Avoid']].map(([tab, label]) => (
                       <button key={tab} onClick={() => setSeasonalTab(tab)}
@@ -130,8 +172,6 @@ const Dashboard = () => {
                       </button>
                     ))}
                   </div>
-
-                  {/* Tab content */}
                   <div style={{ padding:'16px', background:'var(--surface)', display:'flex', flexDirection:'column', gap:'8px' }}>
                     {seasonalTab === 'do' ? (
                       ['🪴 Repot root-bound plants before peak heat','💧 Water more frequently — soil dries faster','🌿 Move sensitive plants from west windows','🌱 Apply fertiliser before growth slows'].map(t => (
@@ -145,7 +185,6 @@ const Dashboard = () => {
                   </div>
                 </div>
               ) : (
-                // Desktop — original 2 column
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr' }}>
                   <div style={{ display:'flex', flexDirection:'column', gap:'16px', padding:'32px', background:'var(--text-hero)' }}>
                     <h2 style={{ fontFamily:"'Playfair Display', serif", fontSize:'22px', fontWeight:'700', color:'#fff', lineHeight:'1.3', margin:0 }}>
@@ -208,7 +247,6 @@ const Dashboard = () => {
                 </span>
               </div>
             ))}
-
             {doneTasks.length > 0 && (
               <>
                 <p style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', marginTop:'8px', color:'var(--text-muted)' }}>
@@ -237,22 +275,42 @@ const Dashboard = () => {
         <div>
           <p style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--text-muted)', marginBottom:'12px' }}>🪴 My plants</p>
 
-          {/* Desktop — 4 columns */}
-          {!isMobile && (
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'16px' }}>
-              {plants.map(p => (
-                <PlantCard key={p.id} p={p} analysing={analysing} analysePhoto={analysePhoto} isMobile={false} />
+          {loadingPlants ? (
+            // Skeleton loading
+            <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4,1fr)', gap:'16px' }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ borderRadius:'20px', padding:'20px', background:'var(--surface)', border:'1.5px solid var(--border)', display:'flex', flexDirection:'column', gap:'12px' }}>
+                  <div style={{ width:'40px', height:'40px', borderRadius:'50%', background:'var(--border)', animation:'pulse 1.5s infinite' }} />
+                  <div style={{ height:'14px', borderRadius:'8px', background:'var(--border)', width:'70%' }} />
+                  <div style={{ height:'10px', borderRadius:'8px', background:'var(--border)', width:'50%' }} />
+                  <div style={{ height:'4px',  borderRadius:'8px', background:'var(--border)' }} />
+                </div>
               ))}
             </div>
-          )}
-
-          {/* Mobile — single column */}
-          {isMobile && (
-            <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
-              {plants.map(p => (
-                <PlantCard key={p.id} p={p} analysing={analysing} analysePhoto={analysePhoto} isMobile={true} />
-              ))}
+          ) : plants.length === 0 ? (
+            // Empty state
+            <div style={{ textAlign:'center', padding:'60px 0', color:'var(--text-muted)' }}>
+              <div style={{ fontSize:'40px', marginBottom:'12px' }}>🌱</div>
+              <div style={{ fontSize:'15px', fontWeight:'600' }}>No plants yet</div>
+              <div style={{ fontSize:'13px', marginTop:'4px' }}>Add your first plant from My Plants page</div>
             </div>
+          ) : (
+            <>
+              {!isMobile && (
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'16px' }}>
+                  {plants.map(p => (
+                    <PlantCard key={p.id} p={p} analysing={analysing} analysePhoto={analysePhoto} isMobile={false} />
+                  ))}
+                </div>
+              )}
+              {isMobile && (
+                <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+                  {plants.map(p => (
+                    <PlantCard key={p.id} p={p} analysing={analysing} analysePhoto={analysePhoto} isMobile={true} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -264,7 +322,6 @@ const Dashboard = () => {
 // ── PLANT CARD ────────────────────────────────────────────────────────────────
 const PlantCard = ({ p, analysing, analysePhoto, isMobile }) => (
   isMobile ? (
-    // Mobile — horizontal card
     <div style={{ display:'flex', gap:'16px', padding:'16px', borderRadius:'16px', background:'var(--surface)', border:'1.5px solid var(--border)', alignItems:'center' }}>
       <div style={{ fontSize:'36px', flexShrink:0 }}>{p.emoji}</div>
       <div style={{ flex:1, minWidth:0 }}>
@@ -295,7 +352,6 @@ const PlantCard = ({ p, analysing, analysePhoto, isMobile }) => (
       </div>
     </div>
   ) : (
-    // Desktop — vertical card
     <div style={{ display:'flex', flexDirection:'column', gap:'12px', borderRadius:'20px', padding:'20px', background:'var(--surface)', border:'1.5px solid var(--border)' }}>
       <div style={{ fontSize:'30px' }}>{p.emoji}</div>
       <div>

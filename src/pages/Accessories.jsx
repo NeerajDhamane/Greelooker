@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
+import api from '../api/api'
+import toast from 'react-hot-toast'
 
 const PRODUCTS = [
   { id:1,  category:'Plants',                  badge:'New',        name:'Monstera Deliciosa',        description:'Iconic split-leaf plant. Medium indirect light. Ships in 5" nursery pot.',            includes:['1 healthy plant','Nursery pot','Care card'],    rating:5, reviews:319, price:499, originalPrice:699,  img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80' },
@@ -326,7 +327,25 @@ const MobileFilterSheet = ({ filters, setFilters, onClose, mode }) => {
 
 // ── CART DRAWER ───────────────────────────────────────────────────────────────
 const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const total    = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const [ordering, setOrdering] = useState(false)
+
+  const handleOrder = async () => {
+    setOrdering(true)
+    try {
+      await api.post('/orders', {
+        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        total: total,
+        type:  'accessories',
+      })
+      toast.success('Order placed successfully! 🌿')
+      onClose()
+    } catch (err) {
+      toast.error('Failed to place order. Please try again.')
+    } finally {
+      setOrdering(false)
+    }
+  }
 
   return (
     <>
@@ -380,9 +399,9 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
               <span style={{ fontSize:'15px', fontWeight:'700', color:'var(--accent)' }}>₹{total}</span>
             </div>
             <div style={{ fontSize:'11px', color:'var(--accent)', textAlign:'center', marginBottom:'12px', fontWeight:'600' }}>🚚 FREE delivery on orders above ₹499</div>
-            <button style={{ width:'100%', padding:'16px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", letterSpacing:'0.05em' }}>
-              PLACE ORDER →
-            </button>
+            <button onClick={handleOrder} disabled={ordering} style={{ width:'100%', padding:'16px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", letterSpacing:'0.05em', opacity: ordering ? 0.7 : 1 }}>
+  {ordering ? 'Placing order...' : 'PLACE ORDER →'}
+</button>
           </div>
         )}
       </div>

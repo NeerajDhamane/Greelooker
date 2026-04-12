@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import api from '../api/api'
+import toast from 'react-hot-toast'
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
@@ -278,7 +280,25 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
 
 // ── CART DRAWER ───────────────────────────────────────────────────────────────
 const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const total    = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const [ordering, setOrdering] = useState(false)
+
+  const handleOrder = async () => {
+    setOrdering(true)
+    try {
+      await api.post('/orders', {
+        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        total: total,
+        type:  'gifting',
+      })
+      toast.success('Gift order placed! 🎁')
+      onClose()
+    } catch (err) {
+      toast.error('Failed to place order. Please try again.')
+    } finally {
+      setOrdering(false)
+    }
+  }
   return (
     <>
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:99 }} />
@@ -326,9 +346,9 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
               <span style={{ fontSize:'15px', fontWeight:'700', color:'var(--accent)' }}>₹{total}</span>
             </div>
             <div style={{ fontSize:'11px', color:'var(--accent)', textAlign:'center', marginBottom:'12px', fontWeight:'600' }}>🎀 Free gift wrapping on orders above ₹499</div>
-            <button style={{ width:'100%', padding:'16px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
-              PLACE ORDER →
-            </button>
+            <button onClick={handleOrder} disabled={ordering} style={{ width:'100%', padding:'16px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", opacity: ordering ? 0.7 : 1 }}>
+  {ordering ? 'Placing order...' : 'PLACE ORDER →'}
+</button>
           </div>
         )}
       </div>

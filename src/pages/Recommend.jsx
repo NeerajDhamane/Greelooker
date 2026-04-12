@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import api from '../api/api'
+import toast from 'react-hot-toast'
 
 const ALL_PLANTS = [
-  { name:'Monstera Deliciosa', sci:'Monstera deliciosa', img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80', score:98, scoreHigh:true, tags:['Medium light','Low water','Large','Air purifier'], why:'Perfect for your living room. Thrives in Mumbai humidity and indirect light from windows.', care:'low', size:'large', filter:'air', placement:[{ icon:'📍', text:'Place 3–5 feet from your window — bright indirect light is ideal, avoid harsh afternoon sun.' },{ icon:'🔄', text:'Rotate 90° every 2 weeks so all leaves get equal light exposure.' },{ icon:'💧', text:'Water only when top 2 inches of soil are dry. Mumbai humidity means less frequent watering.' },{ icon:'📏', text:'Leave at least 2 feet of clearance — Monsteras spread wide as they grow.' }] },
-  { name:'Pothos', sci:'Epipremnum aureum', img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80', score:96, scoreHigh:true, tags:['Low–medium light','Very low water','Trailing'], why:'Incredibly adaptable. Trails beautifully near windows and tolerates Mumbai heat very well.', care:'low', size:'small', filter:'', placement:[{ icon:'📍', text:'Ideal on a high shelf near the window — let the vines trail down naturally.' },{ icon:'☀️', text:'Works in low light corners too, but grows faster with some indirect light.' },{ icon:'💧', text:'Water every 7–10 days. Yellowing leaves = overwatering in your climate.' },{ icon:'✂️', text:'Trim long vines to encourage bushier growth and better shape.' }] },
-  { name:'Snake Plant', sci:'Sansevieria trifasciata', img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80', score:94, scoreHigh:true, tags:['Any light','Very low water','Air purifier'], why:'Survives anything. Ideal for high floors where light varies. Top air purifier.', care:'low', size:'small', filter:'air', placement:[{ icon:'📍', text:'Great in corners, hallways or next to the TV — tolerates low light perfectly.' },{ icon:'🌬️', text:'On higher floors, keep away from direct AC vents — cold dry air dries leaves.' },{ icon:'💧', text:'Water only once every 2–3 weeks. Most overwatered plant in India.' },{ icon:'🌡️', text:'Thrives in Mumbai heat — no special care needed during summer.' }] },
-  { name:'Areca Palm', sci:'Dypsis lutescens', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', score:88, scoreHigh:true, tags:['Bright indirect','Medium water','Large','Tropical'], why:'Adds a tropical feel perfect for Mumbai homes. Loves humidity and bright windows.', care:'medium', size:'large', filter:'', placement:[{ icon:'📍', text:'Place near your brightest window — east or north facing is ideal in Mumbai.' },{ icon:'💦', text:'Mist leaves every 2–3 days in dry seasons.' },{ icon:'📏', text:'Needs at least 4 feet of vertical space. Perfect statement plant.' },{ icon:'🪣', text:'Ensure pot has good drainage — soggy roots are its only weakness.' }] },
-  { name:'Peace Lily', sci:'Spathiphyllum wallisii', img:'https://images.unsplash.com/photo-1632207691143-643e2a9a9361?w=400&q=80', score:82, scoreHigh:false, tags:['Low light','Medium water','Air purifier','Flowering'], why:'Excellent air purifier. Thrives in lower light common in Mumbai apartments.', care:'medium', size:'small', filter:'air', placement:[{ icon:'📍', text:'Ideal in shaded corners or bathrooms — one of few flowering plants for low light.' },{ icon:'💧', text:"Drooping leaves = needs water. It will literally tell you when it's thirsty." },{ icon:'🌸', text:'White flowers bloom in spring — place where you can appreciate them daily.' },{ icon:'🚫', text:'Keep away from direct sun and AC — both cause brown leaf tips.' }] },
-  { name:'ZZ Plant', sci:'Zamioculcas zamiifolia', img:'https://images.unsplash.com/photo-1526565782131-a07de2f0b3f8?w=400&q=80', score:79, scoreHigh:false, tags:['Low light','Very low water','Glossy leaves'], why:'Near-indestructible. Great for spaces with limited light. Perfect for beginners.', care:'low', size:'small', filter:'', placement:[{ icon:'📍', text:'Perfect for dark office corners or shelves far from windows.' },{ icon:'💧', text:'Water once every 3 weeks. Stores water in rhizomes — thrives on neglect.' },{ icon:'✨', text:'Wipe leaves with a damp cloth monthly to keep that natural shine.' },{ icon:'🌡️', text:'Handles Mumbai heat well — keep away from cold AC drafts overnight.' }] },
+  { name:'Monstera Deliciosa', sci:'Monstera deliciosa', img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80', score:98, scoreHigh:true, tags:['Medium light','Low water','Large','Air purifier'], why:'Perfect for your living room. Thrives in Mumbai humidity and indirect light from windows.', care:'low', size:'large', filter:'air', dbId:1, placement:[{ icon:'📍', text:'Place 3–5 feet from your window — bright indirect light is ideal, avoid harsh afternoon sun.' },{ icon:'🔄', text:'Rotate 90° every 2 weeks so all leaves get equal light exposure.' },{ icon:'💧', text:'Water only when top 2 inches of soil are dry. Mumbai humidity means less frequent watering.' },{ icon:'📏', text:'Leave at least 2 feet of clearance — Monsteras spread wide as they grow.' }] },
+  { name:'Pothos', sci:'Epipremnum aureum', img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80', score:96, scoreHigh:true, tags:['Low–medium light','Very low water','Trailing'], why:'Incredibly adaptable. Trails beautifully near windows and tolerates Mumbai heat very well.', care:'low', size:'small', filter:'', dbId:3, placement:[{ icon:'📍', text:'Ideal on a high shelf near the window — let the vines trail down naturally.' },{ icon:'☀️', text:'Works in low light corners too, but grows faster with some indirect light.' },{ icon:'💧', text:'Water every 7–10 days. Yellowing leaves = overwatering in your climate.' },{ icon:'✂️', text:'Trim long vines to encourage bushier growth and better shape.' }] },
+  { name:'Snake Plant', sci:'Sansevieria trifasciata', img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80', score:94, scoreHigh:true, tags:['Any light','Very low water','Air purifier'], why:'Survives anything. Ideal for high floors where light varies. Top air purifier.', care:'low', size:'small', filter:'air', dbId:7, placement:[{ icon:'📍', text:'Great in corners, hallways or next to the TV — tolerates low light perfectly.' },{ icon:'🌬️', text:'On higher floors, keep away from direct AC vents — cold dry air dries leaves.' },{ icon:'💧', text:'Water only once every 2–3 weeks. Most overwatered plant in India.' },{ icon:'🌡️', text:'Thrives in Mumbai heat — no special care needed during summer.' }] },
+  { name:'Areca Palm', sci:'Dypsis lutescens', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', score:88, scoreHigh:true, tags:['Bright indirect','Medium water','Large','Tropical'], why:'Adds a tropical feel perfect for Mumbai homes. Loves humidity and bright windows.', care:'medium', size:'large', filter:'', dbId:4, placement:[{ icon:'📍', text:'Place near your brightest window — east or north facing is ideal in Mumbai.' },{ icon:'💦', text:'Mist leaves every 2–3 days in dry seasons.' },{ icon:'📏', text:'Needs at least 4 feet of vertical space. Perfect statement plant.' },{ icon:'🪣', text:'Ensure pot has good drainage — soggy roots are its only weakness.' }] },
+  { name:'Peace Lily', sci:'Spathiphyllum wallisii', img:'https://images.unsplash.com/photo-1632207691143-643e2a9a9361?w=400&q=80', score:82, scoreHigh:false, tags:['Low light','Medium water','Air purifier','Flowering'], why:'Excellent air purifier. Thrives in lower light common in Mumbai apartments.', care:'medium', size:'small', filter:'air', dbId:5, placement:[{ icon:'📍', text:'Ideal in shaded corners or bathrooms — one of few flowering plants for low light.' },{ icon:'💧', text:"Drooping leaves = needs water. It will literally tell you when it's thirsty." },{ icon:'🌸', text:'White flowers bloom in spring — place where you can appreciate them daily.' },{ icon:'🚫', text:'Keep away from direct sun and AC — both cause brown leaf tips.' }] },
+  { name:'ZZ Plant', sci:'Zamioculcas zamiifolia', img:'https://images.unsplash.com/photo-1526565782131-a07de2f0b3f8?w=400&q=80', score:79, scoreHigh:false, tags:['Low light','Very low water','Glossy leaves'], why:'Near-indestructible. Great for spaces with limited light. Perfect for beginners.', care:'low', size:'small', filter:'', dbId:2, placement:[{ icon:'📍', text:'Perfect for dark office corners or shelves far from windows.' },{ icon:'💧', text:'Water once every 3 weeks. Stores water in rhizomes — thrives on neglect.' },{ icon:'✨', text:'Wipe leaves with a damp cloth monthly to keep that natural shine.' },{ icon:'🌡️', text:'Handles Mumbai heat well — keep away from cold AC drafts overnight.' }] },
 ]
 
 const FLOORS = ['Ground floor','1st floor','2nd floor','3rd floor','4th floor','5th floor','6th floor','7th floor','8th floor','9th floor','10th floor','11th floor','12th floor','13th floor','14th floor','15th floor','16th floor','17th floor','18th floor','19th floor','20th floor','21st floor & above']
@@ -15,7 +17,7 @@ const FLOORS = ['Ground floor','1st floor','2nd floor','3rd floor','4th floor','
 const Pills = ({ options, selected, onSelect, isMobile }) => (
   <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
     {options.map(opt => (
-      <button key={opt} onClick={() => onSelect(opt)} style={{ padding: isMobile ? '9px 16px' : '12px 24px', borderRadius:'50px', fontSize: isMobile ? '13px' : '14px', fontFamily:"'DM Sans', sans-serif", fontWeight: selected===opt ? '600' : '500', border: selected===opt ? '1.5px solid var(--accent)' : '1.5px solid var(--border)', background: selected===opt ? 'var(--pill)' : '#fff', color: selected===opt ? 'var(--accent)' : 'var(--text-body)', cursor:'pointer', boxShadow: selected===opt ? '0 1px 6px rgba(58,125,68,0.15)' : '0 1px 4px rgba(26,46,26,0.08)', transition:'all 0.18s ease' }}>
+      <button key={opt} onClick={() => onSelect(opt)} style={{ padding: isMobile ? '9px 16px' : '12px 24px', borderRadius:'50px', fontSize: isMobile ? '13px' : '14px', fontFamily:"'DM Sans', sans-serif", fontWeight: selected===opt ? '600' : '500', border: selected===opt ? '1.5px solid var(--accent)' : '1.5px solid var(--border)', background: selected===opt ? 'var(--pill)' : '#fff', color: selected===opt ? 'var(--accent)' : 'var(--text-body)', cursor:'pointer', transition:'all 0.18s ease' }}>
         {opt}
       </button>
     ))}
@@ -24,7 +26,7 @@ const Pills = ({ options, selected, onSelect, isMobile }) => (
 
 const Question = ({ label, sub, error, errorMsg, children }) => (
   <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-    <div style={{ fontSize:'15px', fontWeight:'700', color: error ? '#dc2626' : 'var(--text-hero)', display:'flex', alignItems:'center', gap:'6px' }}>
+    <div style={{ fontSize:'15px', fontWeight:'700', color: error ? '#dc2626' : 'var(--text-hero)' }}>
       {label} <span style={{ color:'#dc2626' }}>*</span>
     </div>
     {sub && <p style={{ fontSize:'12px', color:'var(--text-muted)', marginTop:'-4px' }}>{sub}</p>}
@@ -40,18 +42,20 @@ const inputBase = (err) => ({
   border: err ? '1.5px solid #dc2626' : '1.5px solid var(--border)',
   background:'#fff', color:'var(--text-hero)',
   fontSize:'14px', fontFamily:"'DM Sans', sans-serif",
-  outline:'none', boxShadow:'0 1px 4px rgba(26,46,26,0.08)',
+  outline:'none',
 })
 
 const Recommend = () => {
-  const [screen, setScreen]               = useState('quiz')
-  const [answers, setAnswers]             = useState({ room:'', floor:'', sun:'', size:'', sqft:'', area:'', city:'' })
-  const [photoUploaded, setPhotoUploaded] = useState(false)
-  const [photoPreview, setPhotoPreview]   = useState('')
-  const [errors, setErrors]               = useState({})
-  const [activeFilter, setActiveFilter]   = useState('all')
-  const [openPlacements, setOpenPlacements] = useState({})
-  const [isMobile, setIsMobile]           = useState(window.innerWidth <= 768)
+  const [screen,          setScreen]          = useState('quiz')
+  const [answers,         setAnswers]         = useState({ room:'', floor:'', sun:'', size:'', sqft:'', area:'', city:'' })
+  const [photoUploaded,   setPhotoUploaded]   = useState(false)
+  const [photoPreview,    setPhotoPreview]    = useState('')
+  const [errors,          setErrors]          = useState({})
+  const [activeFilter,    setActiveFilter]    = useState('all')
+  const [openPlacements,  setOpenPlacements]  = useState({})
+  const [addedPlants,     setAddedPlants]     = useState({})   // track which cards are added
+  const [addingPlant,     setAddingPlant]     = useState({})   // track loading per card
+  const [isMobile,        setIsMobile]        = useState(window.innerWidth <= 768)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768)
@@ -68,7 +72,11 @@ const Recommend = () => {
     const file = e.target.files[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => { setPhotoPreview(ev.target.result); setPhotoUploaded(true); setErrors(p => ({ ...p, photo: false })) }
+    reader.onload = (ev) => {
+      setPhotoPreview(ev.target.result)
+      setPhotoUploaded(true)
+      setErrors(p => ({ ...p, photo: false }))
+    }
     reader.readAsDataURL(file)
   }
 
@@ -91,10 +99,34 @@ const Recommend = () => {
     window.scrollTo(0, 0)
   }
 
-  const filtered = activeFilter === 'all' ? ALL_PLANTS : ALL_PLANTS.filter(p => p.care===activeFilter || p.size===activeFilter || p.filter===activeFilter)
+  // ── ADD TO DASHBOARD → real API call ────────────────────────
+  const addToDashboard = async (plant, index) => {
+    if (addedPlants[index]) return  // already added
+
+    setAddingPlant(p => ({ ...p, [index]: true }))
+
+    try {
+      await api.post('/plants/user-plants', {
+        plant_id: plant.dbId,
+        room:     answers.room || 'Living room',
+      })
+      setAddedPlants(p => ({ ...p, [index]: true }))
+      toast.success(`${plant.name} added to your dashboard! 🌿`)
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to add plant'
+      toast.error(msg)
+    } finally {
+      setAddingPlant(p => ({ ...p, [index]: false }))
+    }
+  }
+
+  const filtered = activeFilter === 'all'
+    ? ALL_PLANTS
+    : ALL_PLANTS.filter(p => p.care===activeFilter || p.size===activeFilter || p.filter===activeFilter)
+
   const togglePlacement = (i) => setOpenPlacements(p => ({ ...p, [i]: !p[i] }))
 
-  // ── QUIZ ──
+  // ── QUIZ SCREEN ───────────────────────────────────────────────
   if (screen === 'quiz') return (
     <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'var(--bg)' }}>
       <Sidebar />
@@ -145,7 +177,7 @@ const Recommend = () => {
                   <input type="number" placeholder="e.g. 180" min="1" value={answers.sqft}
                     onChange={e => { setAnswers(p => ({...p, sqft:e.target.value})); setErrors(p => ({...p, sqft:false})) }}
                     style={{ ...inputBase(errors.sqft), width: isMobile ? '100%' : '160px' }} />
-                  {!isMobile && <span style={{ fontSize:'13px', color:'var(--text-muted)', fontWeight:'500' }}>sq ft</span>}
+                  {!isMobile && <span style={{ fontSize:'13px', color:'var(--text-muted)' }}>sq ft</span>}
                 </div>
               </Question>
             </div>
@@ -168,7 +200,7 @@ const Recommend = () => {
             <div data-err={errors.photo ? 'true' : undefined}>
               <Question label="📸 Share a photo of your space" sub="Required — AI analyses actual light, layout and vibe for accurate recommendations" error={errors.photo} errorMsg="Please upload a photo of your space">
                 <label style={{ display:'block', cursor:'pointer' }}>
-                  <div style={{ border: errors.photo ? '2px dashed #dc2626' : photoUploaded ? '2px dashed var(--accent)' : '2px dashed var(--border)', borderRadius:'20px', padding:'28px', textAlign:'center', background: errors.photo ? '#fef2f2' : photoUploaded ? 'var(--pill)' : '#fff', boxShadow:'0 1px 4px rgba(26,46,26,0.08)', transition:'all 0.2s' }}>
+                  <div style={{ border: errors.photo ? '2px dashed #dc2626' : photoUploaded ? '2px dashed var(--accent)' : '2px dashed var(--border)', borderRadius:'20px', padding:'28px', textAlign:'center', background: errors.photo ? '#fef2f2' : photoUploaded ? 'var(--pill)' : '#fff', transition:'all 0.2s' }}>
                     <input type="file" accept="image/*" onChange={handlePhoto} style={{ display:'none' }} />
                     {photoPreview ? (
                       <>
@@ -196,13 +228,14 @@ const Recommend = () => {
               </button>
               {isMobile && <p style={{ fontSize:'12px', color:'var(--text-muted)' }}>🌿 Matching from 500+ plants</p>}
             </div>
+
           </div>
         </div>
       </div>
     </div>
   )
 
-  // ── RESULTS ──
+  // ── RESULTS SCREEN ────────────────────────────────────────────
   return (
     <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'var(--bg)' }}>
       <Sidebar />
@@ -215,12 +248,12 @@ const Recommend = () => {
           </button>
 
           <h2 style={{ fontFamily:"'Playfair Display', serif", fontSize: isMobile ? '22px' : '28px', color:'var(--text-hero)', marginBottom:'6px' }}>Your plant matches 🌿</h2>
-          <p style={{ fontSize:'12px', color:'var(--text-muted)', marginBottom:'20px', lineHeight:'1.6' }}>
+          <p style={{ fontSize:'12px', color:'var(--text-muted)', marginBottom:'20px' }}>
             {answers.room} · {answers.floor} · {answers.city}
           </p>
 
           {/* Filter pills */}
-          <div style={{ display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:'20px', overflowX: isMobile ? 'auto' : 'visible', paddingBottom: isMobile ? '4px' : '0' }}>
+          <div style={{ display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:'20px' }}>
             {[['all','All'],['low','Low care'],['medium','Medium care'],['air','Air purifier'],['small','Small'],['large','Large']].map(([val, label]) => (
               <button key={val} onClick={() => setActiveFilter(val)} style={{ padding: isMobile ? '6px 14px' : '7px 16px', borderRadius:'50px', fontSize:'12px', fontWeight:'600', border: activeFilter===val ? '1.5px solid var(--accent)' : '1.5px solid var(--border)', background: activeFilter===val ? 'var(--pill)' : '#fff', color: activeFilter===val ? 'var(--accent)' : 'var(--text-muted)', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", flexShrink:0 }}>
                 {label}
@@ -229,7 +262,7 @@ const Recommend = () => {
           </div>
 
           {/* Plant grid */}
-          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap: isMobile ? '16px' : '16px' }}>
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap:'16px' }}>
             {filtered.map((p, i) => (
               <div key={i} style={{ background:'#fff', border:'1.5px solid var(--border)', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 12px rgba(26,46,26,0.06)' }}>
                 <img src={p.img} alt={p.name} style={{ width:'100%', height: isMobile ? '180px' : '160px', objectFit:'cover', display:'block' }} onError={e => e.target.style.display='none'} />
@@ -246,14 +279,30 @@ const Recommend = () => {
                   </div>
 
                   <div style={{ display:'flex', gap:'6px', flexWrap:'wrap' }}>
-                    {p.tags.map(t => <span key={t} style={{ fontSize:'11px', fontWeight:'500', padding:'3px 10px', borderRadius:'50px', background:'var(--pill)', color:'var(--text-muted)', border:'1px solid var(--border)' }}>{t}</span>)}
+                    {p.tags.map(t => <span key={t} style={{ fontSize:'11px', padding:'3px 10px', borderRadius:'50px', background:'var(--pill)', color:'var(--text-muted)', border:'1px solid var(--border)' }}>{t}</span>)}
                   </div>
 
                   <div style={{ fontSize:'12px', color:'var(--text-body)', lineHeight:'1.6', padding:'10px 12px', borderRadius:'12px', background:'var(--pill)' }}>💡 {p.why}</div>
 
                   <div style={{ display:'flex', gap:'8px' }}>
-                    <button style={{ flex:1, padding:'9px', borderRadius:'50px', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", background:'var(--text-hero)', color:'#fff', border:'none' }}>Add to dashboard</button>
-                    <button style={{ flex:1, padding:'9px', borderRadius:'50px', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", background:'transparent', color:'var(--text-body)', border:'1.5px solid var(--border)' }}>Add to cart</button>
+                    {/* ── ADD TO DASHBOARD — real API ── */}
+                    <button
+                      onClick={() => addToDashboard(p, i)}
+                      disabled={addingPlant[i] || addedPlants[i]}
+                      style={{
+                        flex:1, padding:'9px', borderRadius:'50px', fontSize:'12px', fontWeight:'600',
+                        cursor: addedPlants[i] ? 'default' : 'pointer',
+                        fontFamily:"'DM Sans',sans-serif",
+                        background: addedPlants[i] ? 'var(--leaf)' : 'var(--text-hero)',
+                        color:'#fff', border:'none',
+                        opacity: addingPlant[i] ? 0.7 : 1,
+                        transition:'background 0.3s',
+                      }}>
+                      {addingPlant[i] ? 'Adding...' : addedPlants[i] ? '✅ Added!' : 'Add to dashboard'}
+                    </button>
+                    <button style={{ flex:1, padding:'9px', borderRadius:'50px', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", background:'transparent', color:'var(--text-body)', border:'1.5px solid var(--border)' }}>
+                      Add to cart
+                    </button>
                   </div>
 
                   <button onClick={() => togglePlacement(i)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 12px', borderRadius:'12px', cursor:'pointer', background:'var(--pill)', border:'1.5px solid var(--border)', width:'100%', fontFamily:"'DM Sans',sans-serif", fontSize:'12px', fontWeight:'600', color:'var(--accent)' }}>
@@ -272,6 +321,7 @@ const Recommend = () => {
                       ))}
                     </div>
                   )}
+
                 </div>
               </div>
             ))}

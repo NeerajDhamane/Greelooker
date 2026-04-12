@@ -16,14 +16,20 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// RESPONSE interceptor — handles 401 (not logged in)
+// RESPONSE interceptor — only redirect on 401 if user is already logged in
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const isLoggedIn = localStorage.getItem('gl_user')
+    const is401      = error.response?.status === 401
+    const isAuthRoute = error.config?.url?.includes('/auth/')
+
+    // Only force logout if logged in user gets 401 on a protected route
+    if (is401 && isLoggedIn && !isAuthRoute) {
       localStorage.removeItem('gl_user')
       window.location.href = '/login'
     }
+
     return Promise.reject(error)
   }
 )
