@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import api from '../api/api'
+import { BRAND_NAME } from '../config/brand'
 
 const Register = () => {
   const [screen,   setScreen]   = useState('details')
@@ -60,7 +61,7 @@ const Register = () => {
       }
 
       login(userData)
-      toast.success(`Welcome to GreeLooker, ${userData.name}! 🌱`)
+      toast.success(`Welcome to ${BRAND_NAME}, ${userData.name}! 🌱`)
       navigate('/dashboard')
 
     } catch (err) {
@@ -94,7 +95,7 @@ const Register = () => {
 
         {/* Logo */}
         <div style={{ textAlign:'center', fontFamily:"'Playfair Display', serif", fontWeight:'700', fontSize:'20px', color:'var(--text-hero)' }}>
-          GreeLooker
+          {BRAND_NAME}
         </div>
 
         {/* ── SCREEN 1 — Details ── */}
@@ -106,7 +107,7 @@ const Register = () => {
                 Create account 🌱
               </h2>
               <p style={{ fontSize:'14px', color:'var(--text-muted)', margin:0 }}>
-                Join GreeLooker and find your perfect plants
+                Join {BRAND_NAME} and find your perfect plants
               </p>
             </div>
 

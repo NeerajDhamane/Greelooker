@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { BRAND_NAME } from '../config/brand'
 
 const segments = {
   'Cafes & Restaurants': {
@@ -31,9 +32,9 @@ const plans = [
 ]
 
 const testimonials = [
-  { name:'Priya Mehta',  role:'Owner, The Brew Room Café · Mumbai',             quote:'GreeLooker completely transformed our space. Customers literally stop to take photos now. Our Instagram engagement went up 3x in 2 months.',  avatar:'P' },
+  { name:'Priya Mehta',  role:'Owner, The Brew Room Café · Mumbai',             quote:`${BRAND_NAME} completely transformed our space. Customers literally stop to take photos now. Our Instagram engagement went up 3x in 2 months.`,  avatar:'P' },
   { name:'Rohit Sharma', role:'Facilities Head, NestWork Coworking · Bangalore', quote:'The team handled everything — design, installation, maintenance. Zero effort from our side. Our members love the vibe now.',                    avatar:'R' },
-  { name:'Aisha Kapoor', role:'GM, The Palm Resort · Goa',                      quote:'Our lobby reviews went from "nice hotel" to "absolutely stunning". Plants made the difference. GreeLooker is our go-to partner.',                avatar:'A' },
+  { name:'Aisha Kapoor', role:'GM, The Palm Resort · Goa',                      quote:`Our lobby reviews went from "nice hotel" to "absolutely stunning". Plants made the difference. ${BRAND_NAME} is our go-to partner.`,                avatar:'A' },
 ]
 
 const QuoteModal = ({ onClose, isMobile }) => {
@@ -329,7 +330,7 @@ const Commercials = () => {
       <div style={{ padding: isMobile ? '48px 20px' : '80px 60px', background:'var(--text-hero)', textAlign:'center' }}>
         <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize: isMobile ? '28px' : '40px', color:'#fff', marginBottom:'16px' }}>Ready to go green?</h2>
         <p style={{ fontSize: isMobile ? '14px' : '16px', color:'rgba(255,255,255,0.55)', marginBottom:'32px', maxWidth:'480px', margin:'0 auto 32px' }}>
-          Join 50+ businesses across India who trust GreeLooker to keep their spaces alive and thriving.
+          Join 50+ businesses across India who trust {BRAND_NAME} to keep their spaces alive and thriving.
         </p>
         <button onClick={() => setQuoteOpen(true)} style={{ padding: isMobile ? '13px 28px' : '16px 40px', borderRadius:'50px', border:'none', background:'var(--soft-leaf)', color:'var(--text-hero)', fontSize: isMobile ? '14px' : '16px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
           Get Your Free Quote Today →

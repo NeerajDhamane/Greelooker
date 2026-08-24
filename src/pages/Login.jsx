@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import api from '../api/api'
+import { BRAND_NAME } from '../config/brand'
 
 const Login = () => {
   const [screen,   setScreen]   = useState('phone')
@@ -87,7 +88,7 @@ const Login = () => {
 
         {/* Logo */}
         <div style={{ textAlign:'center', fontFamily:"'Playfair Display', serif", fontWeight:'700', fontSize:'20px', color:'var(--text-hero)' }}>
-          GreeLooker
+          {BRAND_NAME}
         </div>
 
         {/* ── SCREEN 1 — Phone ── */}

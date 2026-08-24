@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { BRAND_NAME } from '../config/brand'
 
 const Navbar = () => {
   const location = useLocation()
@@ -43,7 +44,7 @@ const Navbar = () => {
       <div className="flex items-center gap-1">
         <Link to="/" className="no-underline"
           style={{ fontFamily:"'Playfair Display', serif", fontWeight:'700', fontSize:'18px', color:'var(--text-hero)' }}>
-          GreeLooker
+          {BRAND_NAME}
         </Link>
         <div className="relative">
           <button onClick={() => setMenuOpen(!menuOpen)}
@@ -102,7 +103,7 @@ const Navbar = () => {
 
         <Link to="/" className="no-underline flex-shrink-0"
           style={{ fontFamily:"'Playfair Display', serif", fontWeight:'700', fontSize:'18px', color:'var(--text-hero)' }}>
-          GreeLooker
+          {BRAND_NAME}
         </Link>
 
         {/* Desktop links — hidden on mobile */}

@@ -1,6 +1,7 @@
 import FloatingPlants from "../components/FloatingPlants"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { BRAND_NAME } from "../config/brand"
 import cm1 from '../assets/commercials/cafecomm.jpg'
 import cm2 from '../assets/commercials/officecomm.jpg'
 
@@ -59,11 +60,11 @@ const GIFT_CARDS = [
 ]
 
 const FAQS = [
-  { q: 'What makes GreeLooker different?',            a: 'We use AI to match plants specifically to your space — your city, floor, light, and room type. Not generic lists, actual matches that will thrive.' },
+  { q: `What makes ${BRAND_NAME} different?`,         a: 'We use AI to match plants specifically to your space — your city, floor, light, and room type. Not generic lists, actual matches that will thrive.' },
   { q: 'How does the AI recommendation work?',        a: 'You fill out a short quiz and upload a room photo. Our AI analyses light levels, layout and vibe to recommend plants with the highest survival chance.' },
   { q: 'Do you deliver live plants across India?',    a: 'Yes! We ship live plants across India with special breathable packaging. Most metros get delivery in 3–5 days.' },
   { q: "What if my plant doesn't survive?",           a: "We offer a 30-day survival guarantee. If your plant doesn't make it, we'll replace it for free. No questions asked." },
-  { q: 'Can I use GreeLooker for my office or café?', a: 'Absolutely. Our Commercials section is built for B2B clients — we design, install and maintain green spaces for offices, cafés and hotels.' },
+  { q: `Can I use ${BRAND_NAME} for my office or café?`, a: 'Absolutely. Our Commercials section is built for B2B clients — we design, install and maintain green spaces for offices, cafés and hotels.' },
   { q: 'Are your bouquets really plantable?',         a: 'Yes — every bouquet comes with a mud base embedded with seeds. When the flowers dry out, you plant the base and wildflowers grow from it.' },
 ]
 
@@ -693,7 +694,7 @@ const Home = () => {
             )}
           </div>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} GreeLooker. All rights reserved.</span>
+            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} {BRAND_NAME}. All rights reserved.</span>
             {!isMobile && (
               <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap' }}>
                 {['Privacy Policy', 'Terms', 'Contact', 'About'].map(l => (

@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { BRAND_NAME } from '../config/brand'
 
 const NAV_ITEMS = [
   { icon:'🏠', label:'Dashboard',   path:'/dashboard'   },
@@ -35,7 +36,7 @@ const Sidebar = () => {
           borderBottom:'1.5px solid var(--border)',
           display:'block',
         }}>
-          GreeLooker
+          {BRAND_NAME}
         </Link>
 
         {NAV_ITEMS.map(item => (
