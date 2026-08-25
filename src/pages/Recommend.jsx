@@ -3,14 +3,22 @@ import Sidebar from '../components/Sidebar'
 import api from '../api/api'
 import toast from 'react-hot-toast'
 
-const ALL_PLANTS = [
-  { name:'Monstera Deliciosa', sci:'Monstera deliciosa', img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80', score:98, scoreHigh:true, tags:['Medium light','Low water','Large','Air purifier'], why:'Perfect for your living room. Thrives in Mumbai humidity and indirect light from windows.', care:'low', size:'large', filter:'air', dbId:1, placement:[{ icon:'📍', text:'Place 3–5 feet from your window — bright indirect light is ideal, avoid harsh afternoon sun.' },{ icon:'🔄', text:'Rotate 90° every 2 weeks so all leaves get equal light exposure.' },{ icon:'💧', text:'Water only when top 2 inches of soil are dry. Mumbai humidity means less frequent watering.' },{ icon:'📏', text:'Leave at least 2 feet of clearance — Monsteras spread wide as they grow.' }] },
-  { name:'Pothos', sci:'Epipremnum aureum', img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80', score:96, scoreHigh:true, tags:['Low–medium light','Very low water','Trailing'], why:'Incredibly adaptable. Trails beautifully near windows and tolerates Mumbai heat very well.', care:'low', size:'small', filter:'', dbId:3, placement:[{ icon:'📍', text:'Ideal on a high shelf near the window — let the vines trail down naturally.' },{ icon:'☀️', text:'Works in low light corners too, but grows faster with some indirect light.' },{ icon:'💧', text:'Water every 7–10 days. Yellowing leaves = overwatering in your climate.' },{ icon:'✂️', text:'Trim long vines to encourage bushier growth and better shape.' }] },
-  { name:'Snake Plant', sci:'Sansevieria trifasciata', img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80', score:94, scoreHigh:true, tags:['Any light','Very low water','Air purifier'], why:'Survives anything. Ideal for high floors where light varies. Top air purifier.', care:'low', size:'small', filter:'air', dbId:7, placement:[{ icon:'📍', text:'Great in corners, hallways or next to the TV — tolerates low light perfectly.' },{ icon:'🌬️', text:'On higher floors, keep away from direct AC vents — cold dry air dries leaves.' },{ icon:'💧', text:'Water only once every 2–3 weeks. Most overwatered plant in India.' },{ icon:'🌡️', text:'Thrives in Mumbai heat — no special care needed during summer.' }] },
-  { name:'Areca Palm', sci:'Dypsis lutescens', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', score:88, scoreHigh:true, tags:['Bright indirect','Medium water','Large','Tropical'], why:'Adds a tropical feel perfect for Mumbai homes. Loves humidity and bright windows.', care:'medium', size:'large', filter:'', dbId:4, placement:[{ icon:'📍', text:'Place near your brightest window — east or north facing is ideal in Mumbai.' },{ icon:'💦', text:'Mist leaves every 2–3 days in dry seasons.' },{ icon:'📏', text:'Needs at least 4 feet of vertical space. Perfect statement plant.' },{ icon:'🪣', text:'Ensure pot has good drainage — soggy roots are its only weakness.' }] },
-  { name:'Peace Lily', sci:'Spathiphyllum wallisii', img:'https://images.unsplash.com/photo-1632207691143-643e2a9a9361?w=400&q=80', score:82, scoreHigh:false, tags:['Low light','Medium water','Air purifier','Flowering'], why:'Excellent air purifier. Thrives in lower light common in Mumbai apartments.', care:'medium', size:'small', filter:'air', dbId:5, placement:[{ icon:'📍', text:'Ideal in shaded corners or bathrooms — one of few flowering plants for low light.' },{ icon:'💧', text:"Drooping leaves = needs water. It will literally tell you when it's thirsty." },{ icon:'🌸', text:'White flowers bloom in spring — place where you can appreciate them daily.' },{ icon:'🚫', text:'Keep away from direct sun and AC — both cause brown leaf tips.' }] },
-  { name:'ZZ Plant', sci:'Zamioculcas zamiifolia', img:'https://images.unsplash.com/photo-1526565782131-a07de2f0b3f8?w=400&q=80', score:79, scoreHigh:false, tags:['Low light','Very low water','Glossy leaves'], why:'Near-indestructible. Great for spaces with limited light. Perfect for beginners.', care:'low', size:'small', filter:'', dbId:2, placement:[{ icon:'📍', text:'Perfect for dark office corners or shelves far from windows.' },{ icon:'💧', text:'Water once every 3 weeks. Stores water in rhizomes — thrives on neglect.' },{ icon:'✨', text:'Wipe leaves with a damp cloth monthly to keep that natural shine.' },{ icon:'🌡️', text:'Handles Mumbai heat well — keep away from cold AC drafts overnight.' }] },
-]
+// ── Answer → API code mappings ──────────────────────────────────
+// The UI keeps its friendly labels/emoji; these map the selected label
+// to the normalized code the backend's rule-based scorer expects (see
+// validators/recommendValidators.js on the backend).
+const ROOM_CODES = { 'Bedroom':'bedroom', 'Living Room':'living_room', 'Balcony':'balcony', 'Office / Study':'office', 'Kitchen':'kitchen', 'Bathroom':'bathroom' }
+const SUN_CODES  = { '🌑 Low — barely any light':'low', '🌤️ Medium — indirect light':'medium', '🌞 Bright — lots of indirect':'bright', '☀️ Direct — full sun most of day':'direct' }
+const SIZE_CODES = { 'Small (under 100 sq ft)':'small', 'Medium (100–300 sq ft)':'medium', 'Large (300+ sq ft)':'large' }
+const AREA_CODES = { '🪟 Near the window':'window', '🌿 Corner of the room':'corner', '⬛ Centre of the room':'centre', '🪴 Balcony edge / railing':'balcony_edge', '🖥️ On my desk':'desk', '🛁 Bathroom shelf':'bathroom_shelf' }
+const CITY_CODES = { '🌊 Mumbai':'mumbai', '🌬️ Delhi':'delhi', '🌿 Bangalore':'bangalore', '🌶️ Chennai':'chennai', '🌧️ Kolkata':'kolkata', '🏔️ Pune':'pune', 'Other':'other' }
+
+const floorToNumber = (floorLabel) => {
+  if (!floorLabel) return 0
+  if (floorLabel.toLowerCase().startsWith('ground')) return 0
+  const match = floorLabel.match(/\d+/)
+  return match ? parseInt(match[0], 10) : 0
+}
 
 const FLOORS = ['Ground floor','1st floor','2nd floor','3rd floor','4th floor','5th floor','6th floor','7th floor','8th floor','9th floor','10th floor','11th floor','12th floor','13th floor','14th floor','15th floor','16th floor','17th floor','18th floor','19th floor','20th floor','21st floor & above']
 
@@ -56,6 +64,8 @@ const Recommend = () => {
   const [addedPlants,     setAddedPlants]     = useState({})   // track which cards are added
   const [addingPlant,     setAddingPlant]     = useState({})   // track loading per card
   const [isMobile,        setIsMobile]        = useState(window.innerWidth <= 768)
+  const [results,         setResults]         = useState([])   // real API results
+  const [loadingResults,  setLoadingResults]  = useState(false)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768)
@@ -80,7 +90,13 @@ const Recommend = () => {
     reader.readAsDataURL(file)
   }
 
-  const submit = () => {
+  // ── Submit quiz → real rule-based scoring API ──────────────────
+  // Note: the uploaded photo is still required by this form (kept as-is
+  // for now — see roadmap), but it is NOT sent to or used by the
+  // recommendation API below. Actual image-based analysis is a separate,
+  // deferred piece of work; scoring here is driven entirely by the
+  // structured quiz answers.
+  const submit = async () => {
     const e = {}
     if (!answers.room)  e.room  = true
     if (!answers.floor) e.floor = true
@@ -95,8 +111,25 @@ const Recommend = () => {
       setTimeout(() => document.querySelector('[data-err="true"]')?.scrollIntoView({ behavior:'smooth', block:'center' }), 50)
       return
     }
-    setScreen('results')
-    window.scrollTo(0, 0)
+
+    setLoadingResults(true)
+    try {
+      const res = await api.post('/recommend', {
+        room:  ROOM_CODES[answers.room],
+        floor: floorToNumber(answers.floor),
+        sun:   SUN_CODES[answers.sun],
+        size:  SIZE_CODES[answers.size],
+        area:  AREA_CODES[answers.area],
+        city:  CITY_CODES[answers.city],
+      })
+      setResults(res.data.data)
+      setScreen('results')
+      window.scrollTo(0, 0)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not get recommendations. Please try again.')
+    } finally {
+      setLoadingResults(false)
+    }
   }
 
   // ── ADD TO DASHBOARD → real API call ────────────────────────
@@ -107,7 +140,7 @@ const Recommend = () => {
 
     try {
       await api.post('/plants/user-plants', {
-        plant_id: plant.dbId,
+        plant_id: plant.id,
         room:     answers.room || 'Living room',
       })
       setAddedPlants(p => ({ ...p, [index]: true }))
@@ -120,9 +153,24 @@ const Recommend = () => {
     }
   }
 
+  // Tags are composed from the real returned attributes instead of a
+  // hardcoded per-plant tags array.
+  const tagsFor = (p) => {
+    const tags = []
+    if (p.careLevel) tags.push(`${p.careLevel[0].toUpperCase()}${p.careLevel.slice(1)} care`)
+    if (p.sizeCategory) tags.push(`${p.sizeCategory[0].toUpperCase()}${p.sizeCategory.slice(1)}`)
+    if (p.airPurifying) tags.push('Air purifier')
+    if (p.sunlight) tags.push(p.sunlight)
+    return tags
+  }
+
   const filtered = activeFilter === 'all'
-    ? ALL_PLANTS
-    : ALL_PLANTS.filter(p => p.care===activeFilter || p.size===activeFilter || p.filter===activeFilter)
+    ? results
+    : results.filter(p =>
+        p.careLevel === activeFilter ||
+        p.sizeCategory === activeFilter ||
+        (activeFilter === 'air' && p.airPurifying)
+      )
 
   const togglePlacement = (i) => setOpenPlacements(p => ({ ...p, [i]: !p[i] }))
 
@@ -133,7 +181,7 @@ const Recommend = () => {
       <div style={{ flex:1, overflowY:'auto' }}>
         <div style={{ maxWidth:'860px', margin:'0 auto', padding: isMobile ? '24px 16px 100px' : '48px' }}>
 
-          <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--accent)', marginBottom:'10px' }}>✨ AI Recommendation</p>
+          <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--accent)', marginBottom:'10px' }}>✨ Plant Recommendation</p>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize: isMobile ? '28px' : '42px', color:'var(--text-hero)', marginBottom:'8px' }}>Find your perfect plants</h1>
           <p style={{ fontSize: isMobile ? '13px' : '15px', color:'var(--text-muted)', lineHeight:'1.6', marginBottom:'32px' }}>All fields are required. We'll match you with plants that will actually thrive in your space.</p>
 
@@ -198,7 +246,7 @@ const Recommend = () => {
             <Divider />
 
             <div data-err={errors.photo ? 'true' : undefined}>
-              <Question label="📸 Share a photo of your space" sub="Required — AI analyses actual light, layout and vibe for accurate recommendations" error={errors.photo} errorMsg="Please upload a photo of your space">
+              <Question label="📸 Share a photo of your space" sub="Required for now — photo-based analysis is coming in a future update" error={errors.photo} errorMsg="Please upload a photo of your space">
                 <label style={{ display:'block', cursor:'pointer' }}>
                   <div style={{ border: errors.photo ? '2px dashed #dc2626' : photoUploaded ? '2px dashed var(--accent)' : '2px dashed var(--border)', borderRadius:'20px', padding:'28px', textAlign:'center', background: errors.photo ? '#fef2f2' : photoUploaded ? 'var(--pill)' : '#fff', transition:'all 0.2s' }}>
                     <input type="file" accept="image/*" onChange={handlePhoto} style={{ display:'none' }} />
@@ -211,7 +259,7 @@ const Recommend = () => {
                       <>
                         <div style={{ fontSize:'28px', marginBottom:'8px' }}>📷</div>
                         <div style={{ fontSize:'14px', fontWeight:'600', color:'var(--text-body)', marginBottom:'4px' }}>Upload or take a photo</div>
-                        <div style={{ fontSize:'12px', color:'var(--text-muted)' }}>AI analyses light levels, space and layout</div>
+                        <div style={{ fontSize:'12px', color:'var(--text-muted)' }}>Used to help you remember your space for now</div>
                       </>
                     )}
                   </div>
@@ -222,11 +270,11 @@ const Recommend = () => {
             <div style={{ height:'1.5px', background:'var(--border)' }} />
 
             <div style={{ display:'flex', alignItems:'center', justifyContent: isMobile ? 'center' : 'space-between', flexDirection: isMobile ? 'column' : 'row', gap:'16px' }}>
-              {!isMobile && <p style={{ fontSize:'13px', color:'var(--text-muted)' }}>🌿 Matching from 500+ plants</p>}
-              <button onClick={submit} style={{ padding:'14px 36px', borderRadius:'50px', border:'none', background:'var(--text-hero)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", width: isMobile ? '100%' : 'auto' }}>
-                Find My Plants ✨
+              {!isMobile && <p style={{ fontSize:'13px', color:'var(--text-muted)' }}>🌿 Matched using your actual answers</p>}
+              <button onClick={submit} disabled={loadingResults} style={{ padding:'14px 36px', borderRadius:'50px', border:'none', background:'var(--text-hero)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", width: isMobile ? '100%' : 'auto', opacity: loadingResults ? 0.7 : 1 }}>
+                {loadingResults ? 'Matching...' : 'Find My Plants ✨'}
               </button>
-              {isMobile && <p style={{ fontSize:'12px', color:'var(--text-muted)' }}>🌿 Matching from 500+ plants</p>}
+              {isMobile && <p style={{ fontSize:'12px', color:'var(--text-muted)' }}>🌿 Matched using your actual answers</p>}
             </div>
 
           </div>
@@ -264,22 +312,22 @@ const Recommend = () => {
           {/* Plant grid */}
           <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap:'16px' }}>
             {filtered.map((p, i) => (
-              <div key={i} style={{ background:'#fff', border:'1.5px solid var(--border)', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 12px rgba(26,46,26,0.06)' }}>
-                <img src={p.img} alt={p.name} style={{ width:'100%', height: isMobile ? '180px' : '160px', objectFit:'cover', display:'block' }} onError={e => e.target.style.display='none'} />
+              <div key={p.id ?? i} style={{ background:'#fff', border:'1.5px solid var(--border)', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 12px rgba(26,46,26,0.06)' }}>
+                <img src={p.imageUrl} alt={p.name} style={{ width:'100%', height: isMobile ? '180px' : '160px', objectFit:'cover', display:'block' }} onError={e => e.target.style.display='none'} />
                 <div style={{ padding:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
 
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                     <div>
                       <div style={{ fontSize:'15px', fontWeight:'700', color:'var(--text-hero)' }}>{p.name}</div>
-                      <div style={{ fontSize:'11px', color:'var(--text-muted)', fontStyle:'italic' }}>{p.sci}</div>
+                      <div style={{ fontSize:'11px', color:'var(--text-muted)', fontStyle:'italic' }}>{p.scientificName}</div>
                     </div>
-                    <div style={{ fontSize:'11px', fontWeight:'700', padding:'3px 10px', borderRadius:'50px', flexShrink:0, background: p.scoreHigh?'#dcfce7':'#fef3c7', color: p.scoreHigh?'#166534':'#92400e' }}>
-                      {p.score}% match
+                    <div style={{ fontSize:'11px', fontWeight:'700', padding:'3px 10px', borderRadius:'50px', flexShrink:0, background: p.matchScore >= 85 ? '#dcfce7' : '#fef3c7', color: p.matchScore >= 85 ? '#166534' : '#92400e' }}>
+                      {p.matchScore}% match
                     </div>
                   </div>
 
                   <div style={{ display:'flex', gap:'6px', flexWrap:'wrap' }}>
-                    {p.tags.map(t => <span key={t} style={{ fontSize:'11px', padding:'3px 10px', borderRadius:'50px', background:'var(--pill)', color:'var(--text-muted)', border:'1px solid var(--border)' }}>{t}</span>)}
+                    {tagsFor(p).map(t => <span key={t} style={{ fontSize:'11px', padding:'3px 10px', borderRadius:'50px', background:'var(--pill)', color:'var(--text-muted)', border:'1px solid var(--border)' }}>{t}</span>)}
                   </div>
 
                   <div style={{ fontSize:'12px', color:'var(--text-body)', lineHeight:'1.6', padding:'10px 12px', borderRadius:'12px', background:'var(--pill)' }}>💡 {p.why}</div>
@@ -313,7 +361,7 @@ const Recommend = () => {
                   {openPlacements[i] && (
                     <div style={{ background:'var(--text-hero)', borderRadius:'16px', padding:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
                       <p style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--soft-leaf)', margin:0 }}>📍 Where to place in your space</p>
-                      {p.placement.map((s, j) => (
+                      {(p.placementTips || []).map((s, j) => (
                         <div key={j} style={{ display:'flex', gap:'10px', alignItems:'flex-start' }}>
                           <span style={{ fontSize:'16px', flexShrink:0 }}>{s.icon}</span>
                           <span style={{ fontSize:'12px', color:'rgba(255,255,255,0.75)', lineHeight:'1.6' }}>{s.text}</span>
