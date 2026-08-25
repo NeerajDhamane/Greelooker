@@ -41,7 +41,7 @@ const Dashboard = () => {
       try {
         setLoadingPlants(true)
         const res = await api.get('/plants/user-plants/me')
-        const mapped = res.data.map(p => ({
+        const mapped = res.data.data.map(p => ({
           id:       p.id,
           emoji:    p.emoji  || '🪴',
           name:     p.name,

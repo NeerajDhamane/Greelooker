@@ -53,10 +53,10 @@ const Login = () => {
       })
 
       const userData = {
-        id:    res.data.id,
-        name:  res.data.name,
-        phone: res.data.phone,
-        token: res.data.token,
+        id:    res.data.data.id,
+        name:  res.data.data.name,
+        phone: res.data.data.phone,
+        token: res.data.data.token,
       }
 
       login(userData)
