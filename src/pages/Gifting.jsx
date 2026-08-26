@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
@@ -282,8 +283,19 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
 const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
   const total    = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
   const [ordering, setOrdering] = useState(false)
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const handleOrder = async () => {
+    // Bug #10: guests can fill a cart on this public page; check auth
+    // before attempting checkout instead of a confusing generic failure.
+    if (!user) {
+      toast.error('Please log in to place your order')
+      onClose()
+      navigate('/login')
+      return
+    }
+
     setOrdering(true)
     try {
       await api.post('/orders', {
@@ -294,7 +306,7 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
       toast.success('Gift order placed! 🎁')
       onClose()
     } catch (err) {
-      toast.error('Failed to place order. Please try again.')
+      toast.error(err.response?.data?.message || 'Failed to place order. Please try again.')
     } finally {
       setOrdering(false)
     }

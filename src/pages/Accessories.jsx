@@ -1,24 +1,32 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
+import ProductCard from '../components/ProductCard'
 
 const PRODUCTS = [
-  { id:1,  category:'Plants',                  badge:'New',        name:'Monstera Deliciosa',        description:'Iconic split-leaf plant. Medium indirect light. Ships in 5" nursery pot.',            includes:['1 healthy plant','Nursery pot','Care card'],    rating:5, reviews:319, price:499, originalPrice:699,  img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80' },
-  { id:2,  category:'Plants',                  badge:'Bestseller', name:'Snake Plant',               description:'Near-indestructible. Low light, low water. Best air purifier for bedrooms.',           includes:['1 healthy plant','4" pot','Care card'],         rating:5, reviews:445, price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80' },
-  { id:3,  category:'Plants',                  badge:null,         name:'Pothos Golden',             description:'Trailing vines with golden variegation. Thrives in almost any light condition.',       includes:['1 plant','Hanging pot','Care card'],            rating:4, reviews:267, price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80' },
-  { id:4,  category:'Pots & Planters',         badge:'Bestseller', name:'Terracotta Pot Set',        description:'Set of 3 classic terracotta pots. Breathable clay promotes healthy root growth.',       includes:['3 pots','Drainage holes','Saucers included'],   rating:4, reviews:128, price:349, originalPrice:499,  img:'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&q=80' },
-  { id:5,  category:'Pots & Planters',         badge:null,         name:'Ceramic White Planter',     description:'Minimalist matte white ceramic. Perfect for modern homes and desk setups.',             includes:['1 planter','Drainage hole'],                    rating:5, reviews:84,  price:599, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:6,  category:'Pots & Planters',         badge:'New',        name:'Hanging Macramé Planter',   description:'Handwoven cotton macramé. Great for trailing plants like Pothos.',                      includes:['1 hanger','Adjustable knot','Fits 4" pots'],    rating:4, reviews:56,  price:249, originalPrice:null, img:'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=400&q=80' },
-  { id:7,  category:'Soil & Fertilisers',      badge:'Bestseller', name:'Premium Potting Mix',       description:'Ready-to-use mix with cocopeat, perlite and compost. Perfect drainage for all plants.', includes:['5kg bag','Cocopeat','Perlite','Compost'],       rating:5, reviews:203, price:299, originalPrice:399,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:8,  category:'Soil & Fertilisers',      badge:null,         name:'Liquid Seaweed Fertiliser', description:'Organic seaweed extract. Boosts growth, roots and immunity.',                          includes:['250ml bottle','NPK balanced','Organic'],        rating:4, reviews:91,  price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:9,  category:'Soil & Fertilisers',      badge:null,         name:'Cactus & Succulent Mix',    description:'Fast-draining gritty mix for cacti, succulents and aloe.',                             includes:['2kg bag','Sand mix','Perlite heavy'],           rating:4, reviews:67,  price:179, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:10, category:'Tools',                   badge:null,         name:'Pruning Shears',            description:'Stainless steel bypass pruners with comfort grip. Clean cuts for healthy plants.',       includes:['1 pair','Safety lock','Stainless steel'],       rating:5, reviews:142, price:449, originalPrice:599,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:11, category:'Tools',                   badge:'Bestseller', name:'5-Piece Garden Tool Kit',   description:'Complete kit — trowel, fork, transplanter, weeder and pruner in a carry pouch.',        includes:['5 tools','Carry pouch','Stainless steel'],      rating:4, reviews:178, price:699, originalPrice:899,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:12, category:'Tools',                   badge:null,         name:'Soil Moisture Meter',       description:'No batteries needed. Instantly checks soil moisture to prevent over/under watering.',   includes:['1 meter','No batteries','3-in-1'],              rating:4, reviews:89,  price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:13, category:'Watering Cans & Misters', badge:null,         name:'Long Spout Watering Can',   description:'1.5L with long narrow spout for precise watering. Perfect for indoor plants.',          includes:['1.5L can','Long spout','Ergonomic handle'],     rating:4, reviews:63,  price:349, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
-  { id:14, category:'Watering Cans & Misters', badge:'Bestseller', name:'Fine Mist Spray Bottle',    description:'360° nozzle adjustable from mist to stream. Ideal for humidity-loving tropicals.',       includes:['500ml','Adjustable nozzle','360° spray'],       rating:5, reviews:211, price:149, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80' },
+  { id:1,  category:'Plants',                  badge:'New',        name:'Monstera Deliciosa',        description:'Iconic split-leaf plant. Medium indirect light. Ships in 5" nursery pot.',            includes:['1 healthy plant','Nursery pot','Care card'],    rating:5, reviews:319, price:499, originalPrice:699,  img:'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=400&q=80', availability:'instock',    light:'medium', season:['all'],              growth:'upright' },
+  { id:2,  category:'Plants',                  badge:'Bestseller', name:'Snake Plant',               description:'Near-indestructible. Low light, low water. Best air purifier for bedrooms.',           includes:['1 healthy plant','4" pot','Care card'],         rating:5, reviews:445, price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&q=80', availability:'instock',    light:'low',    season:['all'],              growth:'upright' },
+  { id:3,  category:'Plants',                  badge:null,         name:'Pothos Golden',             description:'Trailing vines with golden variegation. Thrives in almost any light condition.',       includes:['1 plant','Hanging pot','Care card'],            rating:4, reviews:267, price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=400&q=80', availability:'instock',    light:'low',    season:['all','monsoon'],    growth:'trailing' },
+  { id:4,  category:'Pots & Planters',         badge:'Bestseller', name:'Terracotta Pot Set',        description:'Set of 3 classic terracotta pots. Breathable clay promotes healthy root growth.',       includes:['3 pots','Drainage holes','Saucers included'],   rating:4, reviews:128, price:349, originalPrice:499,  img:'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&q=80', availability:'instock' },
+  { id:5,  category:'Pots & Planters',         badge:null,         name:'Ceramic White Planter',     description:'Minimalist matte white ceramic. Perfect for modern homes and desk setups.',             includes:['1 planter','Drainage hole'],                    rating:5, reviews:84,  price:599, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'outofstock' },
+  { id:6,  category:'Pots & Planters',         badge:'New',        name:'Hanging Macramé Planter',   description:'Handwoven cotton macramé. Great for trailing plants like Pothos.',                      includes:['1 hanger','Adjustable knot','Fits 4" pots'],    rating:4, reviews:56,  price:249, originalPrice:null, img:'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=400&q=80', availability:'instock' },
+  { id:7,  category:'Soil & Fertilisers',      badge:'Bestseller', name:'Premium Potting Mix',       description:'Ready-to-use mix with cocopeat, perlite and compost. Perfect drainage for all plants.', includes:['5kg bag','Cocopeat','Perlite','Compost'],       rating:5, reviews:203, price:299, originalPrice:399,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
+  { id:8,  category:'Soil & Fertilisers',      badge:null,         name:'Liquid Seaweed Fertiliser', description:'Organic seaweed extract. Boosts growth, roots and immunity.',                          includes:['250ml bottle','NPK balanced','Organic'],        rating:4, reviews:91,  price:199, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
+  { id:9,  category:'Soil & Fertilisers',      badge:null,         name:'Cactus & Succulent Mix',    description:'Fast-draining gritty mix for cacti, succulents and aloe.',                             includes:['2kg bag','Sand mix','Perlite heavy'],           rating:4, reviews:67,  price:179, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
+  { id:10, category:'Tools',                   badge:null,         name:'Pruning Shears',            description:'Stainless steel bypass pruners with comfort grip. Clean cuts for healthy plants.',       includes:['1 pair','Safety lock','Stainless steel'],       rating:5, reviews:142, price:449, originalPrice:599,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
+  { id:11, category:'Tools',                   badge:'Bestseller', name:'5-Piece Garden Tool Kit',   description:'Complete kit — trowel, fork, transplanter, weeder and pruner in a carry pouch.',        includes:['5 tools','Carry pouch','Stainless steel'],      rating:4, reviews:178, price:699, originalPrice:899,  img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'outofstock' },
+  { id:12, category:'Tools',                   badge:null,         name:'Soil Moisture Meter',       description:'No batteries needed. Instantly checks soil moisture to prevent over/under watering.',   includes:['1 meter','No batteries','3-in-1'],              rating:4, reviews:89,  price:299, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
+  { id:13, category:'Watering Cans & Misters', badge:null,         name:'Long Spout Watering Can',   description:'1.5L with long narrow spout for precise watering. Perfect for indoor plants.',          includes:['1.5L can','Long spout','Ergonomic handle'],     rating:4, reviews:63,  price:349, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
+  { id:14, category:'Watering Cans & Misters', badge:'Bestseller', name:'Fine Mist Spray Bottle',    description:'360° nozzle adjustable from mist to stream. Ideal for humidity-loving tropicals.',       includes:['500ml','Adjustable nozzle','360° spray'],       rating:5, reviews:211, price:149, originalPrice:null, img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80', availability:'instock' },
 ]
+
+// Real counts derived from PRODUCTS, replacing the hardcoded fake
+// numbers that didn't reflect the actual catalog (part of Bug #9).
+const countBy = (key, value) => PRODUCTS.filter(p =>
+  Array.isArray(p[key]) ? p[key].includes(value) : p[key] === value
+).length
 
 // ── SHOP NAV ──────────────────────────────────────────────────────────────────
 const ShopNav = ({ cartCount, onCartOpen, isMobile }) => {
@@ -163,8 +171,8 @@ const FilterSidebar = ({ filters, setFilters }) => {
         {hasFilters && <button onClick={() => setFilters({})} style={{ fontSize:'12px', fontWeight:'600', color:'var(--accent)', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", padding:0, textDecoration:'underline' }}>CLEAR ALL</button>}
       </div>
       <Section id="category" label="Category">
-        {[['Plants','Plants',8],['Pots & Planters','Pots & Planters',4],['Soil & Fertilisers','Soil & Fertilisers',3],['Tools','Tools',3],['Watering Cans & Misters','Watering Cans & Misters',2]].map(([label,value,count]) => (
-          <Checkbox key={value} label={label} count={count} filterKey="category" value={value} />
+        {[['Plants','Plants'],['Pots & Planters','Pots & Planters'],['Soil & Fertilisers','Soil & Fertilisers'],['Tools','Tools'],['Watering Cans & Misters','Watering Cans & Misters']].map(([label,value]) => (
+          <Checkbox key={value} label={label} count={countBy('category', value)} filterKey="category" value={value} />
         ))}
       </Section>
       <Section id="price" label="Price">
@@ -185,25 +193,25 @@ const FilterSidebar = ({ filters, setFilters }) => {
         </div>
       </Section>
       <Section id="availability" label="Availability">
-        <Checkbox label="In Stock" count={12} filterKey="availability" value="instock" />
-        <Checkbox label="Out of Stock" count={2} filterKey="availability" value="outofstock" />
+        <Checkbox label="In Stock" count={countBy('availability','instock')} filterKey="availability" value="instock" />
+        <Checkbox label="Out of Stock" count={countBy('availability','outofstock')} filterKey="availability" value="outofstock" />
       </Section>
       <Section id="light" label="Light Requirement">
-        <Checkbox label="Low Light" count={4} filterKey="light" value="low" />
-        <Checkbox label="Medium Indirect" count={5} filterKey="light" value="medium" />
-        <Checkbox label="Bright Indirect" count={3} filterKey="light" value="bright" />
-        <Checkbox label="Direct Sunlight" count={2} filterKey="light" value="direct" />
+        <Checkbox label="Low Light" count={countBy('light','low')} filterKey="light" value="low" />
+        <Checkbox label="Medium Indirect" count={countBy('light','medium')} filterKey="light" value="medium" />
+        <Checkbox label="Bright Indirect" count={countBy('light','bright')} filterKey="light" value="bright" />
+        <Checkbox label="Direct Sunlight" count={countBy('light','direct')} filterKey="light" value="direct" />
       </Section>
       <Section id="season" label="Growing Season">
-        <Checkbox label="All Seasons" count={10} filterKey="season" value="all" />
-        <Checkbox label="Monsoon" count={3} filterKey="season" value="monsoon" />
-        <Checkbox label="Spring" count={4} filterKey="season" value="spring" />
-        <Checkbox label="Summer" count={5} filterKey="season" value="summer" />
+        <Checkbox label="All Seasons" count={countBy('season','all')} filterKey="season" value="all" />
+        <Checkbox label="Monsoon" count={countBy('season','monsoon')} filterKey="season" value="monsoon" />
+        <Checkbox label="Spring" count={countBy('season','spring')} filterKey="season" value="spring" />
+        <Checkbox label="Summer" count={countBy('season','summer')} filterKey="season" value="summer" />
       </Section>
       <Section id="growth" label="Growth Pattern">
-        <Checkbox label="Trailing / Vining" count={4} filterKey="growth" value="trailing" />
-        <Checkbox label="Upright" count={6} filterKey="growth" value="upright" />
-        <Checkbox label="Bushy / Spreading" count={4} filterKey="growth" value="bushy" />
+        <Checkbox label="Trailing / Vining" count={countBy('growth','trailing')} filterKey="growth" value="trailing" />
+        <Checkbox label="Upright" count={countBy('growth','upright')} filterKey="growth" value="upright" />
+        <Checkbox label="Bushy / Spreading" count={countBy('growth','bushy')} filterKey="growth" value="bushy" />
       </Section>
     </div>
   )
@@ -308,6 +316,17 @@ const MobileFilterSheet = ({ filters, setFilters, onClose, mode }) => {
                 <Checkbox label="Bright Indirect" filterKey="light" value="bright" />
                 <Checkbox label="Direct Sunlight" filterKey="light" value="direct" />
               </Section>
+              <Section id="season" label="Growing Season">
+                <Checkbox label="All Seasons" filterKey="season" value="all" />
+                <Checkbox label="Monsoon" filterKey="season" value="monsoon" />
+                <Checkbox label="Spring" filterKey="season" value="spring" />
+                <Checkbox label="Summer" filterKey="season" value="summer" />
+              </Section>
+              <Section id="growth" label="Growth Pattern">
+                <Checkbox label="Trailing / Vining" filterKey="growth" value="trailing" />
+                <Checkbox label="Upright" filterKey="growth" value="upright" />
+                <Checkbox label="Bushy / Spreading" filterKey="growth" value="bushy" />
+              </Section>
             </>
           )}
         </div>
@@ -329,8 +348,21 @@ const MobileFilterSheet = ({ filters, setFilters, onClose, mode }) => {
 const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
   const total    = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
   const [ordering, setOrdering] = useState(false)
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const handleOrder = async () => {
+    // Bug #10: previously this attempted checkout regardless of login
+    // state, and a guest saw only a generic "Failed to place order" with
+    // no indication why. /accessories is a public route, so guests can
+    // fill a cart — check auth before hitting the API, not after.
+    if (!user) {
+      toast.error('Please log in to place your order')
+      onClose()
+      navigate('/login')
+      return
+    }
+
     setOrdering(true)
     try {
       await api.post('/orders', {
@@ -341,7 +373,7 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
       toast.success('Order placed successfully! 🌿')
       onClose()
     } catch (err) {
-      toast.error('Failed to place order. Please try again.')
+      toast.error(err.response?.data?.message || 'Failed to place order. Please try again.')
     } finally {
       setOrdering(false)
     }
@@ -409,87 +441,6 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
   )
 }
 
-// ── PRODUCT CARD ──────────────────────────────────────────────────────────────
-const ProductCardImproved = ({ product, onAddToCart, isMobile }) => {
-  const [added, setAdded]       = useState(false)
-  const [wishlist, setWishlist] = useState(false)
-  const [hovered, setHovered]   = useState(false)
-
-  const handleAdd = () => {
-    onAddToCart(product)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
-  }
-
-  const discount = product.originalPrice ? Math.round((1 - product.price/product.originalPrice)*100) : null
-
-  return (
-    <div style={{ background:'#fff', borderRadius:'4px', overflow:'hidden', cursor:'pointer', position:'relative', border:'1px solid #f0f0f0', transition:'box-shadow 0.2s', boxShadow: hovered ? '0 4px 20px rgba(0,0,0,0.1)' : 'none' }}
-      onMouseEnter={() => !isMobile && setHovered(true)}
-      onMouseLeave={() => !isMobile && setHovered(false)}>
-
-      <div style={{ position:'relative', paddingTop:'120%', background:'#f8f8f8', overflow:'hidden' }}>
-        <img src={product.img} alt={product.name}
-          style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.4s ease', transform: hovered ? 'scale(1.06)' : 'scale(1)' }}
-          onError={e => e.target.style.display='none'} />
-
-        <button onClick={e => { e.stopPropagation(); setWishlist(!wishlist) }}
-          style={{ position:'absolute', top:'8px', right:'8px', background:'#fff', border:'none', borderRadius:'50%', width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 8px rgba(0,0,0,0.12)', fontSize:'16px', zIndex:2 }}>
-          {wishlist ? '❤️' : '🤍'}
-        </button>
-
-        {product.badge && (
-          <span style={{ position:'absolute', top:'8px', left:'8px', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background: product.badge==='Bestseller' ? '#ff6161' : 'var(--accent)', color:'#fff', letterSpacing:'0.04em', zIndex:2 }}>
-            {product.badge.toUpperCase()}
-          </span>
-        )}
-
-        {discount && (
-          <span style={{ position:'absolute', bottom:'8px', left:'8px', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background:'#14a800', color:'#fff', zIndex:2 }}>
-            {discount}% OFF
-          </span>
-        )}
-
-        {/* Desktop hover cart bar */}
-        {!isMobile && (
-          <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'var(--text-hero)', padding:'12px', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', transform: hovered ? 'translateY(0)' : 'translateY(100%)', transition:'transform 0.25s ease', zIndex:3 }}
-            onClick={e => { e.stopPropagation(); handleAdd() }}>
-            <span style={{ fontSize:'16px' }}>{added ? '✓' : '🛒'}</span>
-            <span style={{ fontSize:'13px', fontWeight:'700', color:'#fff', letterSpacing:'0.05em' }}>{added ? 'ADDED!' : 'ADD TO CART'}</span>
-          </div>
-        )}
-      </div>
-
-      <div style={{ padding: isMobile ? '8px 10px 12px' : '12px 12px 14px' }}>
-        <div style={{ fontSize:'10px', color:'#888', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:'3px' }}>{product.category}</div>
-        <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'#222', lineHeight:'1.4', marginBottom:'4px' }}>{product.name}</div>
-        {!isMobile && (
-          <div style={{ fontSize:'12px', color:'#888', lineHeight:'1.5', marginBottom:'8px', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{product.description}</div>
-        )}
-        <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'6px' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:'3px', background:'var(--accent)', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'2px 6px', borderRadius:'2px' }}>
-            {product.rating} ★
-          </div>
-          <span style={{ fontSize:'10px', color:'#888' }}>({product.reviews.toLocaleString()})</span>
-        </div>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'4px' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'4px', flexWrap:'wrap' }}>
-            <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight:'700', color:'#222' }}>₹{product.price}</span>
-            {product.originalPrice && <span style={{ fontSize:'11px', color:'#aaa', textDecoration:'line-through' }}>₹{product.originalPrice}</span>}
-          </div>
-          {/* Mobile add to cart button — always visible */}
-          {isMobile && (
-            <button onClick={e => { e.stopPropagation(); handleAdd() }}
-              style={{ padding:'7px 14px', borderRadius:'4px', border:`1px solid ${added ? 'var(--accent)' : '#e0e0e0'}`, background: added ? 'var(--accent)' : '#fff', color: added ? '#fff' : '#333', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", transition:'all 0.2s', flexShrink:0 }}>
-              {added ? '✓ Added' : '+ Add'}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 const Accessories = () => {
   const [cart, setCart]             = useState([])
@@ -519,10 +470,14 @@ const Accessories = () => {
   const changeQty = (id, delta) => setCart(prev => prev.map(i => i.id===id ? {...i, qty:i.qty+delta} : i).filter(i => i.qty > 0))
 
   let filtered = PRODUCTS.filter(p => {
-    const matchCategory = !filters.category?.length || filters.category.includes(p.category)
-    const matchPriceMin = !filters.priceMin || p.price >= Number(filters.priceMin)
-    const matchPriceMax = !filters.priceMax || p.price <= Number(filters.priceMax)
-    return matchCategory && matchPriceMin && matchPriceMax
+    const matchCategory     = !filters.category?.length     || filters.category.includes(p.category)
+    const matchPriceMin     = !filters.priceMin              || p.price >= Number(filters.priceMin)
+    const matchPriceMax     = !filters.priceMax              || p.price <= Number(filters.priceMax)
+    const matchAvailability = !filters.availability?.length  || filters.availability.includes(p.availability)
+    const matchLight        = !filters.light?.length         || (p.light && filters.light.includes(p.light))
+    const matchSeason       = !filters.season?.length        || (p.season && filters.season.some(s => p.season.includes(s)))
+    const matchGrowth       = !filters.growth?.length        || (p.growth && filters.growth.includes(p.growth))
+    return matchCategory && matchPriceMin && matchPriceMax && matchAvailability && matchLight && matchSeason && matchGrowth
   })
 
   const activeSortBy = filters.sortBy || sortBy
@@ -531,7 +486,7 @@ const Accessories = () => {
   if (activeSortBy === 'rating')     filtered = [...filtered].sort((a,b) => b.rating - a.rating)
 
   const cartCount = cart.reduce((sum,i) => sum+i.qty, 0)
-  const hasFilters = filters.category?.length || filters.priceMin
+  const hasFilters = filters.category?.length || filters.priceMin || filters.availability?.length || filters.light?.length || filters.season?.length || filters.growth?.length
 
   return (
     <div style={{ minHeight:'100vh', background:'#fafafa', display:'flex', flexDirection:'column' }}>
@@ -615,7 +570,7 @@ const Accessories = () => {
           ) : (
             <div style={{ display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : (viewMode==='grid' ? 'repeat(4,1fr)' : '1fr'), gap: isMobile ? '10px' : '16px' }}>
               {filtered.map(product => (
-                <ProductCardImproved key={product.id} product={product} onAddToCart={addToCart} isMobile={isMobile} />
+                <ProductCard key={product.id} product={product} onAddToCart={addToCart} isMobile={isMobile} />
               ))}
             </div>
           )}
@@ -628,7 +583,7 @@ const Accessories = () => {
           <button onClick={() => setSheetMode('filter')}
             style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'14px', background:'none', border:'none', borderRight:'1px solid #e0e0e0', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontSize:'14px', fontWeight:'600', color: hasFilters ? 'var(--accent)' : '#333' }}>
             <span>⚙️</span>
-            FILTER {hasFilters ? `(${(filters.category?.length||0) + (filters.priceMin?1:0)})` : ''}
+            FILTER {hasFilters ? `(${(filters.category?.length||0) + (filters.priceMin?1:0) + (filters.availability?.length||0) + (filters.light?.length||0) + (filters.season?.length||0) + (filters.growth?.length||0)})` : ''}
           </button>
           <button onClick={() => setSheetMode('sort')}
             style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'14px', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontSize:'14px', fontWeight:'600', color: filters.sortBy && filters.sortBy !== 'featured' ? 'var(--accent)' : '#333' }}>

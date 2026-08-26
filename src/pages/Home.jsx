@@ -1,6 +1,6 @@
 import FloatingPlants from "../components/FloatingPlants"
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { BRAND_NAME } from "../config/brand"
 import cm1 from '../assets/commercials/cafecomm.jpg'
 import cm2 from '../assets/commercials/officecomm.jpg'
@@ -120,6 +120,7 @@ const StepConnector = ({ id, direction }) => {
 }
 
 const Home = () => {
+  const navigate = useNavigate()
   const [activeProject, setActiveProject]   = useState('cafe')
   const [openFaq, setOpenFaq]               = useState(null)
   const [howStep, setHowStep]               = useState(0)
@@ -287,6 +288,7 @@ const Home = () => {
           <div id="best-scroll" style={{ display: 'flex', gap: '14px', animation: 'bestScroll 32s linear infinite', width: 'max-content', paddingLeft: isMobile ? '20px' : '60px' }}>
             {[...BESTSELLERS, ...BESTSELLERS].map((p, i) => (
               <div key={i} style={{ flexShrink: 0, width: isMobile ? '160px' : '220px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.25s ease, box-shadow 0.25s ease' }}
+                onClick={() => navigate('/accessories')}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,0,0,0.35)'; e.currentTarget.style.border = '1px solid rgba(201,219,178,0.3)'; document.getElementById('best-scroll').style.animationPlayState = 'paused' }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.border = '1px solid rgba(255,255,255,0.1)'; document.getElementById('best-scroll').style.animationPlayState = 'running' }}>
                 <div style={{ position: 'relative', height: isMobile ? '120px' : '160px', background: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
@@ -303,8 +305,8 @@ const Home = () => {
                       <span style={{ fontSize: '14px', fontWeight: '700', color: '#fff' }}>₹{p.price}</span>
                       {p.originalPrice && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', textDecoration: 'line-through', marginLeft: '4px' }}>₹{p.originalPrice}</span>}
                     </div>
-                    <button onClick={e => { e.stopPropagation(); const btn = e.currentTarget; btn.textContent = '✓'; btn.style.background = 'var(--soft-leaf)'; btn.style.color = 'var(--text-hero)'; setTimeout(() => { btn.textContent = '+ Cart'; btn.style.background = 'rgba(255,255,255,0.12)'; btn.style.color = '#fff' }, 1500) }}
-                      style={{ padding: '5px 10px', borderRadius: '50px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '10px', fontWeight: '600', cursor: 'pointer', fontFamily: "'DM Sans',sans-serif", transition: 'all 0.2s' }}>+ Cart</button>
+                    <button onClick={e => { e.stopPropagation(); navigate('/accessories') }}
+                      style={{ padding: '5px 10px', borderRadius: '50px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '10px', fontWeight: '600', cursor: 'pointer', fontFamily: "'DM Sans',sans-serif", transition: 'all 0.2s' }}>Shop now →</button>
                   </div>
                 </div>
               </div>
