@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../context/AuthContext'
+import api from '../api/api'
+import toast from 'react-hot-toast'
 
 const Settings = () => {
-  const { user, logout } = useAuth()
+  const { user, logout, updateUser } = useAuth()
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
   // Profile fields
-  const [name,  setName]  = useState(user?.name  || 'Arjun')
-  const [phone, setPhone] = useState(user?.phone || '+91 98765 43210')
+  const [name,  setName]  = useState(user?.name  || '')
+  const [phone, setPhone] = useState(user?.phone || '')
+  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
   // Notification toggles
@@ -29,9 +32,21 @@ const Settings = () => {
   const toggleNotif = (key) =>
     setNotifs(prev => ({ ...prev, [key]: !prev[key] }))
 
-  const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const res = await api.put('/users/profile', { name, phone })
+      // Refresh the cached identity so Navbar/Sidebar reflect the change
+      // immediately, without needing a logout/login cycle.
+      updateUser({ name: res.data.data.name, phone: res.data.data.phone })
+      setSaved(true)
+      toast.success('Profile updated!')
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to save changes')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -94,7 +109,7 @@ const Settings = () => {
             </Field>
 
             {/* Save button */}
-            <button onClick={handleSave} style={{
+            <button onClick={handleSave} disabled={saving} style={{
               alignSelf:'flex-start',
               padding:'10px 24px',
               borderRadius:'50px',
@@ -103,11 +118,12 @@ const Settings = () => {
               color:'#fff',
               fontSize:'13px',
               fontWeight:'700',
-              cursor:'pointer',
+              cursor: saving ? 'default' : 'pointer',
               fontFamily:"'DM Sans', sans-serif",
               transition:'background 0.3s',
+              opacity: saving ? 0.7 : 1,
             }}>
-              {saved ? '✅ Saved!' : 'Save changes'}
+              {saving ? 'Saving...' : saved ? '✅ Saved!' : 'Save changes'}
             </button>
 
           </div>

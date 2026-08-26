@@ -2,16 +2,12 @@ import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/api'
+import toast from 'react-hot-toast'
 
-const getHealthColor = (health) => {
-  if (health >= 85) return 'var(--accent)'
-  if (health >= 60) return '#f59e0b'
+const getHealthColor = (score) => {
+  if (score >= 85) return 'var(--accent)'
+  if (score >= 60) return '#f59e0b'
   return '#ef4444'
-}
-
-const getCareText = (waterFreq) => {
-  if (!waterFreq) return '💧 Check schedule'
-  return `💧 ${waterFreq}`
 }
 
 const Dashboard = () => {
@@ -23,11 +19,10 @@ const Dashboard = () => {
   const [loadingPlants, setLoadingPlants] = useState(true)
   const [analysing,    setAnalysing]    = useState({})
 
-  const [tasks, setTasks] = useState([
-    { id:1, icon:'🌱', title:'Fertilise Pothos',  sub:'Kitchen · Next: 15 Mar',      badge:'weekly', badgeText:'Weekly', done:false },
-    { id:2, icon:'☀️', title:'Rotate Areca Palm', sub:'Balcony · Next: 12 Mar',      badge:'daily',  badgeText:'3 days', done:false },
-    { id:3, icon:'💧', title:'Water Monstera',    sub:'Living room · Next: Tomorrow', badge:'urgent', badgeText:'Daily',  done:false },
-  ])
+  const [tasks, setTasks] = useState([])
+  const [loadingTasks, setLoadingTasks] = useState(true)
+  const [completingTask, setCompletingTask] = useState({})
+  const [completedToday, setCompletedToday] = useState([]) // tasks checked off this session
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768)
@@ -46,9 +41,9 @@ const Dashboard = () => {
           emoji:    p.emoji  || '🪴',
           name:     p.name,
           room:     p.room,
-          health:   p.health,
-          color:    getHealthColor(p.health),
-          care:     getCareText(p.water_freq),
+          health:   p.healthScore,
+          color:    getHealthColor(p.healthScore),
+          care:     p.careText,
           aiClass:  '',
           aiText:   '',
         }))
@@ -69,6 +64,22 @@ const Dashboard = () => {
     fetchPlants()
   }, [])
 
+  // ── Fetch real care tasks — computed from actual watering schedules (Bug #6) ──
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoadingTasks(true)
+        const res = await api.get('/users/care-tasks')
+        setTasks(res.data.data)
+      } catch (err) {
+        console.error('Failed to fetch care tasks:', err)
+      } finally {
+        setLoadingTasks(false)
+      }
+    }
+    fetchTasks()
+  }, [])
+
   const now        = new Date()
   const days       = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
   const months     = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -76,7 +87,31 @@ const Dashboard = () => {
   const dateString = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} · Mumbai`
   const monthBadge = `${months[now.getMonth()]} · ${seasons[now.getMonth()]}`
 
-  const toggleTask = (id) => setTasks(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t))
+  // Marking a task done logs a real care action — it can't be
+  // unchecked afterward, same as you can't "un-water" a plant.
+  const completeTask = async (task) => {
+    if (completingTask[task.userPlantId] || completedToday.includes(task.userPlantId)) return
+
+    setCompletingTask(prev => ({ ...prev, [task.userPlantId]: true }))
+    try {
+      await api.post('/users/care-log', {
+        user_plant_id: task.userPlantId,
+        action: 'watered',
+      })
+      setCompletedToday(prev => [...prev, task.userPlantId])
+      toast.success(`${task.name} watered! 💧`)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to log care')
+    } finally {
+      setCompletingTask(prev => ({ ...prev, [task.userPlantId]: false }))
+    }
+  }
+
+  const taskBadge = (daysOverdue) => {
+    if (daysOverdue >= 3) return { style: 'urgent', text: `${daysOverdue}d overdue` }
+    if (daysOverdue >= 1) return { style: 'daily',  text: `${daysOverdue}d overdue` }
+    return { style: 'weekly', text: 'Due today' }
+  }
 
   const analysePhoto = (e, plantId) => {
     if (!e.target.files[0]) return
@@ -94,8 +129,8 @@ const Dashboard = () => {
     }, 1500)
   }
 
-  const pendingTasks = tasks.filter(t => !t.done)
-  const doneTasks    = tasks.filter(t =>  t.done)
+  const pendingTasks = tasks.filter(t => !completedToday.includes(t.userPlantId))
+  const doneTasks    = tasks.filter(t =>  completedToday.includes(t.userPlantId))
 
   // Greeting based on time
   const hour = now.getHours()
@@ -232,43 +267,57 @@ const Dashboard = () => {
         {/* ── CARE TASKS ── */}
         <div>
           <p style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--text-muted)', marginBottom:'12px' }}>🔔 Care tasks for today</p>
+          {loadingTasks ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
+              {[1,2].map(i => (
+                <div key={i} style={{ height:'56px', borderRadius:'16px', background:'var(--surface)', border:'1.5px solid var(--border)' }} />
+              ))}
+            </div>
+          ) : tasks.length === 0 ? (
+            <div style={{ padding:'20px', borderRadius:'16px', background:'var(--surface)', border:'1.5px solid var(--border)', textAlign:'center', color:'var(--text-muted)', fontSize:'13px' }}>
+              🌿 Nothing due today — your plants are all watered on schedule.
+            </div>
+          ) : (
           <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
-            {pendingTasks.map(t => (
-              <div key={t.id} onClick={() => toggleTask(t.id)}
-                style={{ display:'flex', alignItems:'center', gap: isMobile ? '12px' : '16px', padding: isMobile ? '12px 16px' : '16px 20px', borderRadius:'16px', cursor:'pointer', background:'var(--surface)', border:'1.5px solid var(--border)' }}>
+            {pendingTasks.map(t => {
+              const badge = taskBadge(t.daysOverdue)
+              return (
+              <div key={t.userPlantId} onClick={() => completeTask(t)}
+                style={{ display:'flex', alignItems:'center', gap: isMobile ? '12px' : '16px', padding: isMobile ? '12px 16px' : '16px 20px', borderRadius:'16px', cursor: completingTask[t.userPlantId] ? 'default' : 'pointer', background:'var(--surface)', border:'1.5px solid var(--border)', opacity: completingTask[t.userPlantId] ? 0.6 : 1 }}>
                 <div style={{ width:'22px', height:'22px', border:'2px solid var(--border)', background:'var(--surface)', borderRadius:'50%', flexShrink:0 }} />
-                <span style={{ fontSize: isMobile ? '18px' : '20px' }}>{t.icon}</span>
+                <span style={{ fontSize: isMobile ? '18px' : '20px' }}>💧</span>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'var(--text-hero)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>{t.title}</div>
-                  <div style={{ fontSize:'11px', marginTop:'2px', color:'var(--text-muted)' }}>{t.sub}</div>
+                  <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'var(--text-hero)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>Water {t.name}</div>
+                  <div style={{ fontSize:'11px', marginTop:'2px', color:'var(--text-muted)' }}>{t.room}</div>
                 </div>
-                <span style={{ fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'50px', flexShrink:0, background: t.badge==='weekly'?'#dcfce7':t.badge==='daily'?'#fef3c7':'#fee2e2', color: t.badge==='weekly'?'#166534':t.badge==='daily'?'#92400e':'#991b1b' }}>
-                  {t.badgeText}
+                <span style={{ fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'50px', flexShrink:0, background: badge.style==='weekly'?'#dcfce7':badge.style==='daily'?'#fef3c7':'#fee2e2', color: badge.style==='weekly'?'#166534':badge.style==='daily'?'#92400e':'#991b1b' }}>
+                  {badge.text}
                 </span>
               </div>
-            ))}
+            )})}
             {doneTasks.length > 0 && (
               <>
                 <p style={{ fontSize:'10px', fontWeight:'700', letterSpacing:'0.1em', textTransform:'uppercase', marginTop:'8px', color:'var(--text-muted)' }}>
                   ✓ Completed ({doneTasks.length})
                 </p>
                 {doneTasks.map(t => (
-                  <div key={t.id} onClick={() => toggleTask(t.id)}
-                    style={{ display:'flex', alignItems:'center', gap: isMobile ? '12px' : '16px', padding: isMobile ? '12px 16px' : '16px 20px', borderRadius:'16px', cursor:'pointer', opacity:0.5, background:'var(--pill)', border:'1.5px solid var(--border)' }}>
+                  <div key={t.userPlantId}
+                    style={{ display:'flex', alignItems:'center', gap: isMobile ? '12px' : '16px', padding: isMobile ? '12px 16px' : '16px 20px', borderRadius:'16px', opacity:0.5, background:'var(--pill)', border:'1.5px solid var(--border)' }}>
                     <div style={{ width:'22px', height:'22px', background:'var(--accent)', color:'#fff', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:'700', flexShrink:0 }}>✓</div>
-                    <span style={{ fontSize: isMobile ? '18px' : '20px' }}>{t.icon}</span>
+                    <span style={{ fontSize: isMobile ? '18px' : '20px' }}>💧</span>
                     <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'var(--text-muted)', textDecoration:'line-through' }}>{t.title}</div>
-                      <div style={{ fontSize:'11px', marginTop:'2px', color:'var(--text-muted)' }}>{t.sub}</div>
+                      <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'var(--text-muted)', textDecoration:'line-through' }}>Water {t.name}</div>
+                      <div style={{ fontSize:'11px', marginTop:'2px', color:'var(--text-muted)' }}>{t.room}</div>
                     </div>
                     <span style={{ fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'50px', flexShrink:0, background:'var(--border)', color:'var(--text-muted)' }}>
-                      {t.badgeText}
+                      Done
                     </span>
                   </div>
                 ))}
               </>
             )}
           </div>
+          )}
         </div>
 
         {/* ── MY PLANTS ── */}

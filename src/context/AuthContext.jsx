@@ -17,8 +17,19 @@ export const AuthProvider = ({ children }) => {
     setUser(null)
   }
 
+  // Merges a partial update (e.g. new name/phone from Settings) into the
+  // cached user object, so the change shows up immediately in the
+  // Navbar/Sidebar without requiring a logout/login cycle.
+  const updateUser = (partial) => {
+    setUser((prev) => {
+      const next = { ...prev, ...partial }
+      localStorage.setItem('gl_user', JSON.stringify(next))
+      return next
+    })
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

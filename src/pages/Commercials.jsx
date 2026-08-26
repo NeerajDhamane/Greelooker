@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BRAND_NAME } from '../config/brand'
+import api from '../api/api'
+import toast from 'react-hot-toast'
 
 const segments = {
   'Cafes & Restaurants': {
@@ -40,10 +42,35 @@ const testimonials = [
 const QuoteModal = ({ onClose, isMobile }) => {
   const [form, setForm]           = useState({ name:'', business:'', segment:'', size:'', city:'', phone:'', message:'' })
   const [submitted, setSubmitted] = useState(false)
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
-  const submit = () => {
-    if (!form.name || !form.phone || !form.segment) return
-    setSubmitted(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [errors, setErrors]       = useState({})
+  const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: false })) }
+
+  const submit = async () => {
+    const e = {}
+    if (!form.name)    e.name = true
+    if (!form.phone)   e.phone = true
+    if (!form.segment) e.segment = true
+    setErrors(e)
+    if (Object.keys(e).length > 0) return
+
+    setSubmitting(true)
+    try {
+      await api.post('/commercials/quote', {
+        contactName:   form.name,
+        businessName:  form.business || undefined,
+        segment:       form.segment,
+        spaceSizeSqft: form.size ? Number(form.size) : undefined,
+        city:          form.city || undefined,
+        phone:         form.phone,
+        message:       form.message || undefined,
+      })
+      setSubmitted(true)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to submit your request. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -71,7 +98,7 @@ const QuoteModal = ({ onClose, isMobile }) => {
                 <div>
                   <label style={{ fontSize:'12px', fontWeight:'600', color:'var(--text-muted)', display:'block', marginBottom:'6px' }}>Your Name *</label>
                   <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Rahul Sharma"
-                    style={{ width:'100%', padding:'10px 14px', borderRadius:'12px', border:'1.5px solid var(--border)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', boxSizing:'border-box' }} />
+                    style={{ width:'100%', padding:'10px 14px', borderRadius:'12px', border: errors.name ? '1.5px solid #dc2626' : '1.5px solid var(--border)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', boxSizing:'border-box' }} />
                 </div>
                 <div>
                   <label style={{ fontSize:'12px', fontWeight:'600', color:'var(--text-muted)', display:'block', marginBottom:'6px' }}>Business Name</label>
@@ -80,10 +107,10 @@ const QuoteModal = ({ onClose, isMobile }) => {
                 </div>
               </div>
               <div>
-                <label style={{ fontSize:'12px', fontWeight:'600', color:'var(--text-muted)', display:'block', marginBottom:'6px' }}>Business Type *</label>
+                <label style={{ fontSize:'12px', fontWeight:'600', color: errors.segment ? '#dc2626' : 'var(--text-muted)', display:'block', marginBottom:'6px' }}>Business Type *</label>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
                   {['Cafe & Restaurant','Office & Coworking','Hotel & Resort','Retail Store','Other'].map(s => (
-                    <button key={s} onClick={() => set('segment', s)} style={{ padding:'7px 14px', borderRadius:'50px', border: form.segment===s ? '1.5px solid var(--accent)' : '1.5px solid var(--border)', background: form.segment===s ? 'var(--pill)' : '#fff', color: form.segment===s ? 'var(--accent)' : 'var(--text-muted)', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
+                    <button key={s} onClick={() => set('segment', s)} style={{ padding:'7px 14px', borderRadius:'50px', border: form.segment===s ? '1.5px solid var(--accent)' : errors.segment ? '1.5px solid #dc2626' : '1.5px solid var(--border)', background: form.segment===s ? 'var(--pill)' : '#fff', color: form.segment===s ? 'var(--accent)' : 'var(--text-muted)', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
                       {s}
                     </button>
                   ))}
@@ -102,11 +129,11 @@ const QuoteModal = ({ onClose, isMobile }) => {
                 </div>
               </div>
               <div>
-                <label style={{ fontSize:'12px', fontWeight:'600', color:'var(--text-muted)', display:'block', marginBottom:'6px' }}>Phone Number *</label>
+                <label style={{ fontSize:'12px', fontWeight:'600', color: errors.phone ? '#dc2626' : 'var(--text-muted)', display:'block', marginBottom:'6px' }}>Phone Number *</label>
                 <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
                   <span style={{ padding:'10px 14px', borderRadius:'12px', border:'1.5px solid var(--border)', fontSize:'13px', color:'var(--text-muted)', background:'var(--pill)', flexShrink:0 }}>🇮🇳 +91</span>
                   <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="9876543210" type="tel" maxLength={10}
-                    style={{ flex:1, padding:'10px 14px', borderRadius:'12px', border:'1.5px solid var(--border)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
+                    style={{ flex:1, padding:'10px 14px', borderRadius:'12px', border: errors.phone ? '1.5px solid #dc2626' : '1.5px solid var(--border)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
                 </div>
               </div>
               <div>
@@ -114,8 +141,8 @@ const QuoteModal = ({ onClose, isMobile }) => {
                 <textarea value={form.message} onChange={e => set('message', e.target.value)} placeholder="Describe your space, style preferences..." rows={3}
                   style={{ width:'100%', padding:'10px 14px', borderRadius:'12px', border:'1.5px solid var(--border)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', resize:'none', boxSizing:'border-box' }} />
               </div>
-              <button onClick={submit} style={{ width:'100%', padding:'14px', borderRadius:'50px', border:'none', background:'var(--text-hero)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
-                Request Free Quote →
+              <button onClick={submit} disabled={submitting} style={{ width:'100%', padding:'14px', borderRadius:'50px', border:'none', background:'var(--text-hero)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor: submitting ? 'default' : 'pointer', fontFamily:"'DM Sans',sans-serif", opacity: submitting ? 0.7 : 1 }}>
+                {submitting ? 'Submitting...' : 'Request Free Quote →'}
               </button>
               <p style={{ fontSize:'11px', color:'var(--text-muted)', textAlign:'center' }}>🔒 Your details are safe with us. No spam, ever.</p>
             </div>
