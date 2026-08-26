@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { BRAND_NAME } from '../config/brand'
+import UserBadge from './UserBadge'
 
 const Navbar = () => {
   const location = useLocation()
@@ -183,20 +184,32 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <div className="flex gap-3 p-4">
-            <Link to="/login" className="no-underline flex-1" onClick={() => setMobileOpen(false)}>
-              <button className="w-full py-3 rounded-full text-sm font-medium cursor-pointer"
-                style={{ color:'var(--text-body)', border:'1.5px solid var(--border)', background:'transparent' }}>
-                Log in
-              </button>
-            </Link>
-            <Link to="/register" className="no-underline flex-1" onClick={() => setMobileOpen(false)}>
-              <button className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer"
-                style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
-                Get started
-              </button>
-            </Link>
-          </div>
+          {user ? (
+            <div style={{ padding:'16px' }}>
+              <UserBadge withLogout />
+              <Link to="/dashboard" className="no-underline" onClick={() => setMobileOpen(false)}>
+                <button className="w-full mt-3 py-3 rounded-full text-sm font-semibold cursor-pointer"
+                  style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
+                  Go to Dashboard ›
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex gap-3 p-4">
+              <Link to="/login" className="no-underline flex-1" onClick={() => setMobileOpen(false)}>
+                <button className="w-full py-3 rounded-full text-sm font-medium cursor-pointer"
+                  style={{ color:'var(--text-body)', border:'1.5px solid var(--border)', background:'transparent' }}>
+                  Log in
+                </button>
+              </Link>
+              <Link to="/register" className="no-underline flex-1" onClick={() => setMobileOpen(false)}>
+                <button className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer"
+                  style={{ background:'var(--text-hero)', color:'var(--surface)', border:'none' }}>
+                  Get started
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </>

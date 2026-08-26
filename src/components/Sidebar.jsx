@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { BRAND_NAME } from '../config/brand'
+import UserBadge from './UserBadge'
 
 const NAV_ITEMS = [
   { icon:'🏠', label:'Dashboard',   path:'/dashboard'   },
@@ -57,19 +58,9 @@ const Sidebar = () => {
         <div style={{
           marginTop:'auto', paddingTop:'16px',
           borderTop:'1.5px solid var(--border)',
-          display:'flex', alignItems:'center',
-          gap:'12px', paddingLeft:'12px',
+          paddingLeft:'12px',
         }}>
-          <div style={{
-            width:'32px', height:'32px', borderRadius:'50%',
-            background:'var(--accent)', color:'#fff',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontWeight:'700', fontSize:'14px', flexShrink:0,
-          }}>A</div>
-          <div>
-            <div style={{ fontSize:'14px', fontWeight:'600', color:'var(--text-body)' }}>Rohit</div>
-            <div style={{ fontSize:'12px', color:'var(--text-muted)' }}>Free plan</div>
-          </div>
+          <UserBadge withLogout />
         </div>
       </div>
 
