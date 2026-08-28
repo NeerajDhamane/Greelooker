@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
+import { Search, User, Gift, Heart, Check, Truck, Leaf, Award, Trash2 } from 'lucide-react'
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
+  const { user } = useAuth()
   const [openMenu, setOpenMenu] = useState(null)
 
   const menus = {
@@ -17,7 +20,7 @@ const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
   }
 
   return (
-    <div style={{ background:'#fff', borderBottom:'1px solid #f0f0f0', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
+    <div style={{ background:'var(--surface)', borderBottom:'1.5px solid var(--border)', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
       <div style={{ display:'flex', alignItems:'center', gap:'12px', padding: isMobile ? '0 16px' : '0 32px', height:'56px', maxWidth:'1440px', margin:'0 auto' }}>
 
         <Link to="/" style={{ textDecoration:'none', flexShrink:0 }}>
@@ -37,10 +40,10 @@ const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
                   {name} <span style={{ fontSize:'8px' }}>▾</span>
                 </button>
                 {openMenu===name && (
-                  <div style={{ position:'absolute', top:'100%', left:0, background:'#fff', border:'1px solid #f0f0f0', borderRadius:'8px', padding:'8px 0', minWidth:'220px', zIndex:999, boxShadow:'0 8px 24px rgba(0,0,0,0.12)' }}>
+                  <div style={{ position:'absolute', top:'100%', left:0, background:'var(--surface)', border:'1.5px solid var(--border)', borderRadius:'8px', padding:'8px 0', minWidth:'220px', zIndex:999, boxShadow:'0 8px 24px rgba(0,0,0,0.12)' }}>
                     {menus[name].map(item => (
                       <div key={item} style={{ padding:'9px 20px', fontSize:'13px', color:'#444', cursor:'pointer' }}
-                        onMouseEnter={e => { e.currentTarget.style.background='#f8f8f8'; e.currentTarget.style.color='var(--accent)' }}
+                        onMouseEnter={e => { e.currentTarget.style.background='var(--pill)'; e.currentTarget.style.color='var(--accent)' }}
                         onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#444' }}>
                         {item}
                       </div>
@@ -55,30 +58,30 @@ const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
         {/* Mobile search */}
         {isMobile && (
           <div style={{ flex:1, position:'relative' }}>
-            <span style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#888' }}>🔍</span>
+            <span style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)', display:'flex' }}><Search size={14} /></span>
             <input type="text" placeholder="Search gifts..."
-              style={{ width:'100%', padding:'8px 12px 8px 30px', borderRadius:'20px', border:'1px solid #e8e8e8', background:'#f5f5f5', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', boxSizing:'border-box' }} />
+              style={{ width:'100%', padding:'8px 12px 8px 30px', borderRadius:'20px', border:'1.5px solid var(--border)', background:'var(--pill)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', boxSizing:'border-box' }} />
           </div>
         )}
 
         <div style={{ display:'flex', alignItems:'center', gap: isMobile ? '8px' : '12px', flexShrink:0 }}>
           {!isMobile && (
             <div style={{ position:'relative' }}>
-              <span style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#888' }}>🔍</span>
+              <span style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)', display:'flex' }}><Search size={14} /></span>
               <input type="text" placeholder="Search gifts..."
-                style={{ padding:'9px 16px 9px 34px', borderRadius:'4px', border:'1px solid #e8e8e8', background:'#fafafa', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', width:'200px' }}
+                style={{ padding:'9px 16px 9px 34px', borderRadius:'14px', border:'1.5px solid var(--border)', background:'var(--bg)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", outline:'none', width:'200px' }}
                 onFocus={e => e.target.style.borderColor='var(--accent)'}
-                onBlur={e => e.target.style.borderColor='#e8e8e8'} />
+                onBlur={e => e.target.style.borderColor='var(--border)'} />
             </div>
           )}
           {!isMobile && (
-            <Link to="/login" style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', textDecoration:'none', padding:'4px 10px', color:'#333' }}>
-              <span style={{ fontSize:'18px' }}>👤</span>
-              <span style={{ fontSize:'10px', fontWeight:'600' }}>Profile</span>
+            <Link to={user ? '/settings' : '/login'} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', textDecoration:'none', padding:'4px 10px', color:'var(--text-body)' }}>
+              <User size={18} />
+              <span style={{ fontSize:'10px', fontWeight:'600' }}>{user ? 'Profile' : 'Log in'}</span>
             </Link>
           )}
-          <button onClick={onCartOpen} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', background:'none', border:'none', cursor:'pointer', padding:'4px 8px', color:'#333', position:'relative' }}>
-            <span style={{ fontSize:'20px' }}>🎁</span>
+          <button onClick={onCartOpen} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', background:'none', border:'none', cursor:'pointer', padding:'4px 8px', color:'var(--text-body)', position:'relative' }}>
+            <Gift size={20} />
             {!isMobile && <span style={{ fontSize:'10px', fontWeight:'600' }}>Cart</span>}
             {cartCount > 0 && <span style={{ position:'absolute', top:'0', right:'2px', background:'var(--accent)', color:'#fff', fontSize:'9px', fontWeight:'700', padding:'1px 5px', borderRadius:'50px', minWidth:'16px', textAlign:'center' }}>{cartCount}</span>}
           </button>
@@ -90,7 +93,7 @@ const GiftNav = ({ cartCount, onCartOpen, isMobile }) => {
         <div style={{ display:'flex', gap:'8px', padding:'8px 16px', overflowX:'auto' }}>
           <style>{`.hide-sb::-webkit-scrollbar{display:none}`}</style>
           {Object.keys(menus).map(name => (
-            <button key={name} style={{ flexShrink:0, padding:'6px 14px', borderRadius:'20px', border:'1px solid #e0e0e0', background:'#fff', fontSize:'12px', fontWeight:'500', color:'#333', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", whiteSpace:'nowrap' }}>
+            <button key={name} style={{ flexShrink:0, padding:'6px 14px', borderRadius:'20px', border:'1.5px solid var(--border)', background:'var(--surface)', fontSize:'12px', fontWeight:'500', color:'var(--text-body)', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", whiteSpace:'nowrap' }}>
               {name}
             </button>
           ))}
@@ -107,10 +110,10 @@ const GiftFilterSidebar = ({ filters, setFilters }) => {
   const hasFilters = Object.values(filters).some(v => Array.isArray(v) ? v.length > 0 : !!v)
 
   const Section = ({ id, label, children }) => (
-    <div style={{ borderBottom:'1px solid #f0f0f0' }}>
+    <div style={{ borderBottom:'1.5px solid var(--border)' }}>
       <button onClick={() => toggle(id)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', background:'none', border:'none', cursor:'pointer', padding:'14px 0', fontFamily:"'DM Sans',sans-serif" }}>
-        <span style={{ fontSize:'13px', fontWeight:'700', color:'#222', textTransform:'uppercase', letterSpacing:'0.04em' }}>{label}</span>
-        <span style={{ fontSize:'16px', color:'#888', lineHeight:1 }}>{open[id] ? '−' : '+'}</span>
+        <span style={{ fontSize:'13px', fontWeight:'700', color:'var(--text-hero)', textTransform:'uppercase', letterSpacing:'0.04em' }}>{label}</span>
+        <span style={{ fontSize:'16px', color:'var(--text-muted)', lineHeight:1 }}>{open[id] ? '−' : '+'}</span>
       </button>
       {open[id] && <div style={{ paddingBottom:'12px' }}>{children}</div>}
     </div>
@@ -124,8 +127,8 @@ const GiftFilterSidebar = ({ filters, setFilters }) => {
           const current = prev[filterKey] || []
           return { ...prev, [filterKey]: checked ? current.filter(v => v!==value) : [...current, value] }
         })}>
-        <div style={{ width:'16px', height:'16px', borderRadius:'3px', border:`2px solid ${checked?'var(--accent)':'#ddd'}`, background: checked?'var(--accent)':'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, transition:'all 0.15s' }}>
-          {checked && <span style={{ color:'#fff', fontSize:'10px', fontWeight:'700' }}>✓</span>}
+        <div style={{ width:'16px', height:'16px', borderRadius:'3px', border:`2px solid ${checked?'var(--accent)':'var(--border)'}`, background: checked?'var(--accent)':'var(--surface)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, transition:'all 0.15s' }}>
+          {checked && <Check size={11} color='#fff' strokeWidth={3} />}
         </div>
         <span style={{ fontSize:'13px', color:'#444' }}>{label}</span>
       </label>
@@ -133,9 +136,9 @@ const GiftFilterSidebar = ({ filters, setFilters }) => {
   }
 
   return (
-    <div style={{ width:'240px', flexShrink:0, padding:'20px 24px', borderRight:'1px solid #f0f0f0', background:'#fff', overflowY:'auto' }}>
+    <div style={{ width:'240px', flexShrink:0, padding:'20px 24px', borderRight:'1.5px solid var(--border)', background:'var(--surface)', overflowY:'auto' }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px' }}>
-        <span style={{ fontSize:'15px', fontWeight:'700', color:'#222' }}>FILTERS</span>
+        <span style={{ fontSize:'15px', fontWeight:'700', color:'var(--text-hero)' }}>FILTERS</span>
         {hasFilters && <button onClick={() => setFilters({})} style={{ fontSize:'12px', fontWeight:'600', color:'var(--accent)', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", padding:0, textDecoration:'underline' }}>CLEAR ALL</button>}
       </div>
       <Section id="occasion" label="Occasion">
@@ -146,15 +149,15 @@ const GiftFilterSidebar = ({ filters, setFilters }) => {
       <Section id="budget" label="Budget">
         <div style={{ display:'flex', gap:'8px', marginBottom:'10px' }}>
           <input type="number" placeholder="₹ Min" value={filters.priceMin||''} onChange={e => setFilters(p => ({...p, priceMin:e.target.value}))}
-            style={{ width:'80px', padding:'8px 10px', border:'1px solid #e0e0e0', borderRadius:'4px', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
-          <span style={{ color:'#aaa', alignSelf:'center' }}>to</span>
+            style={{ width:'80px', padding:'8px 10px', border:'1.5px solid var(--border)', borderRadius:'14px', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
+          <span style={{ color:'var(--text-muted)', alignSelf:'center' }}>to</span>
           <input type="number" placeholder="₹ Max" value={filters.priceMax||''} onChange={e => setFilters(p => ({...p, priceMax:e.target.value}))}
-            style={{ width:'80px', padding:'8px 10px', border:'1px solid #e0e0e0', borderRadius:'4px', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
+            style={{ width:'80px', padding:'8px 10px', border:'1.5px solid var(--border)', borderRadius:'14px', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", outline:'none' }} />
         </div>
         <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
           {[['Under ₹299',0,299],['₹300–599',300,599],['₹600–999',600,999],['₹1000+',1000,99999]].map(([label,min,max]) => (
             <button key={label} onClick={() => setFilters(p => ({...p, priceMin:min, priceMax:max}))}
-              style={{ padding:'5px 10px', borderRadius:'50px', border:`1px solid ${filters.priceMin===min?'var(--accent)':'#e0e0e0'}`, background: filters.priceMin===min?'#fff3f0':'#fff', color: filters.priceMin===min?'var(--accent)':'#666', fontSize:'11px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
+              style={{ padding:'5px 10px', borderRadius:'50px', border:`1px solid ${filters.priceMin===min?'var(--accent)':'var(--border)'}`, background: filters.priceMin===min?'var(--pill)':'var(--surface)', color: filters.priceMin===min?'var(--accent)':'var(--text-muted)', fontSize:'11px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
               {label}
             </button>
           ))}
@@ -180,10 +183,10 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
   const toggle = (key) => setOpen(p => ({ ...p, [key]: !p[key] }))
 
   const Section = ({ id, label, children }) => (
-    <div style={{ borderBottom:'1px solid #f0f0f0' }}>
+    <div style={{ borderBottom:'1.5px solid var(--border)' }}>
       <button onClick={() => toggle(id)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', background:'none', border:'none', cursor:'pointer', padding:'14px 0', fontFamily:"'DM Sans',sans-serif" }}>
-        <span style={{ fontSize:'14px', fontWeight:'700', color:'#222' }}>{label}</span>
-        <span style={{ fontSize:'16px', color:'#888' }}>{open[id] ? '−' : '+'}</span>
+        <span style={{ fontSize:'14px', fontWeight:'700', color:'var(--text-hero)' }}>{label}</span>
+        <span style={{ fontSize:'16px', color:'var(--text-muted)' }}>{open[id] ? '−' : '+'}</span>
       </button>
       {open[id] && <div style={{ paddingBottom:'16px' }}>{children}</div>}
     </div>
@@ -197,10 +200,10 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
           const current = prev[filterKey] || []
           return { ...prev, [filterKey]: checked ? current.filter(v => v!==value) : [...current, value] }
         })}>
-        <div style={{ width:'20px', height:'20px', borderRadius:'4px', border:`2px solid ${checked?'var(--accent)':'#ddd'}`, background: checked?'var(--accent)':'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          {checked && <span style={{ color:'#fff', fontSize:'12px', fontWeight:'700' }}>✓</span>}
+        <div style={{ width:'20px', height:'20px', borderRadius:'14px', border:`2px solid ${checked?'var(--accent)':'var(--border)'}`, background: checked?'var(--accent)':'var(--surface)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          {checked && <Check size={13} color='#fff' strokeWidth={3} />}
         </div>
-        <span style={{ fontSize:'14px', color:'#333' }}>{label}</span>
+        <span style={{ fontSize:'14px', color:'var(--text-body)' }}>{label}</span>
       </label>
     )
   }
@@ -208,20 +211,20 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
   return (
     <>
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:200 }} />
-      <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'#fff', borderRadius:'20px 20px 0 0', zIndex:201, maxHeight:'85vh', display:'flex', flexDirection:'column', boxShadow:'0 -4px 24px rgba(0,0,0,0.15)', animation:'slideUp 0.3s ease' }}>
+      <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'var(--surface)', borderRadius:'20px 20px 0 0', zIndex:201, maxHeight:'85vh', display:'flex', flexDirection:'column', boxShadow:'0 -4px 24px rgba(0,0,0,0.15)', animation:'slideUp 0.3s ease' }}>
         <style>{`@keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }`}</style>
 
         <div style={{ display:'flex', justifyContent:'center', padding:'12px 0 0' }}>
-          <div style={{ width:'40px', height:'4px', borderRadius:'2px', background:'#e0e0e0' }} />
+          <div style={{ width:'40px', height:'4px', borderRadius:'50px', background:'var(--border)' }} />
         </div>
 
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'16px 20px', borderBottom:'1px solid #f0f0f0' }}>
-          <span style={{ fontSize:'16px', fontWeight:'700', color:'#222' }}>{mode === 'sort' ? 'Sort By' : 'Filters'}</span>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'16px 20px', borderBottom:'1.5px solid var(--border)' }}>
+          <span style={{ fontSize:'16px', fontWeight:'700', color:'var(--text-hero)' }}>{mode === 'sort' ? 'Sort By' : 'Filters'}</span>
           <div style={{ display:'flex', gap:'12px', alignItems:'center' }}>
             {mode === 'filter' && (
               <button onClick={() => setFilters({})} style={{ fontSize:'13px', fontWeight:'600', color:'var(--accent)', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>Clear All</button>
             )}
-            <button onClick={onClose} style={{ background:'none', border:'none', fontSize:'20px', cursor:'pointer', color:'#666', lineHeight:1 }}>×</button>
+            <button onClick={onClose} style={{ background:'none', border:'none', fontSize:'20px', cursor:'pointer', color:'var(--text-muted)', lineHeight:1 }}>×</button>
           </div>
         </div>
 
@@ -232,7 +235,7 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
                 <button key={val} onClick={() => { setFilters(p => ({...p, sortBy:val})); onClose() }}
                   style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 0', background:'none', border:'none', borderBottom:'1px solid #f8f8f8', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontSize:'15px', color: filters.sortBy===val ? 'var(--accent)' : '#333', fontWeight: filters.sortBy===val ? '700' : '400' }}>
                   {label}
-                  {filters.sortBy===val && <span style={{ color:'var(--accent)' }}>✓</span>}
+                  {filters.sortBy===val && <Check size={16} color='var(--accent)' strokeWidth={3} />}
                 </button>
               ))}
             </div>
@@ -247,7 +250,7 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
                 <div style={{ display:'flex', flexWrap:'wrap', gap:'8px', padding:'4px 0' }}>
                   {[['Under ₹299',0,299],['₹300–599',300,599],['₹600–999',600,999],['₹1000+',1000,99999]].map(([label,min,max]) => (
                     <button key={label} onClick={() => setFilters(p => ({...p, priceMin:min, priceMax:max}))}
-                      style={{ padding:'8px 16px', borderRadius:'50px', border:`1.5px solid ${filters.priceMin===min?'var(--accent)':'#e0e0e0'}`, background: filters.priceMin===min?'rgba(58,125,68,0.06)':'#fff', color: filters.priceMin===min?'var(--accent)':'#666', fontSize:'13px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
+                      style={{ padding:'8px 16px', borderRadius:'50px', border:`1.5px solid ${filters.priceMin===min?'var(--accent)':'var(--border)'}`, background: filters.priceMin===min?'rgba(58,125,68,0.06)':'var(--surface)', color: filters.priceMin===min?'var(--accent)':'var(--text-muted)', fontSize:'13px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
                       {label}
                     </button>
                   ))}
@@ -269,7 +272,7 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
 
         {mode === 'filter' && (
           <div style={{ padding:'16px 20px', borderTop:'1px solid #f0f0f0' }}>
-            <button onClick={onClose} style={{ width:'100%', padding:'14px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
+            <button onClick={onClose} style={{ width:'100%', padding:'14px', borderRadius:'14px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
               Apply Filters
             </button>
           </div>
@@ -280,7 +283,7 @@ const MobileGiftFilterSheet = ({ filters, setFilters, onClose, mode }) => {
 }
 
 // ── CART DRAWER ───────────────────────────────────────────────────────────────
-const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
+const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, onOrdered, isMobile }) => {
   const total    = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
   const [ordering, setOrdering] = useState(false)
   const { user } = useAuth()
@@ -298,12 +301,26 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
 
     setOrdering(true)
     try {
-      await api.post('/orders', {
-        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
-        total: total,
-        type:  'gifting',
-      })
+      // Cart is shared with Accessories, so it can hold items from both
+      // — group by source and submit one order per group, since each
+      // backend order still has a single `type`.
+      const bySource = cart.reduce((acc, item) => {
+        acc[item.source] = acc[item.source] || []
+        acc[item.source].push(item)
+        return acc
+      }, {})
+
+      for (const [source, items] of Object.entries(bySource)) {
+        const groupTotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+        await api.post('/orders', {
+          items: items.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+          total: groupTotal,
+          type:  source,
+        })
+      }
+
       toast.success('Gift order placed! 🎁')
+      onOrdered()
       onClose()
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to place order. Please try again.')
@@ -314,51 +331,51 @@ const CartDrawer = ({ cart, onClose, onRemove, onChangeQty, isMobile }) => {
   return (
     <>
       <div onClick={onClose} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', zIndex:99 }} />
-      <div style={{ position:'fixed', top:0, right:0, height:'100vh', width: isMobile ? '100vw' : '400px', background:'#fff', zIndex:100, display:'flex', flexDirection:'column', boxShadow:'-4px 0 24px rgba(0,0,0,0.15)' }}>
-        <div style={{ padding:'20px 24px', borderBottom:'1px solid #f0f0f0', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+      <div style={{ position:'fixed', top:0, right:0, height:'100vh', width: isMobile ? '100vw' : '400px', background:'var(--surface)', zIndex:100, display:'flex', flexDirection:'column', boxShadow:'-4px 0 24px rgba(0,0,0,0.15)' }}>
+        <div style={{ padding:'20px 24px', borderBottom:'1.5px solid var(--border)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:'20px', color:'#222', fontWeight:'700', margin:0 }}>Gift Cart 🎁</h2>
-            <p style={{ fontSize:'12px', color:'#888', marginTop:'4px' }}>{cart.length} item{cart.length!==1?'s':''}</p>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:'20px', color:'var(--text-hero)', fontWeight:'700', margin:0 }}>Gift Cart 🎁</h2>
+            <p style={{ fontSize:'12px', color:'var(--text-muted)', marginTop:'4px' }}>{cart.length} item{cart.length!==1?'s':''}</p>
           </div>
-          <button onClick={onClose} style={{ background:'none', border:'1px solid #e0e0e0', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'18px', color:'#666', display:'flex', alignItems:'center', justifyContent:'center' }}>×</button>
+          <button onClick={onClose} style={{ background:'none', border:'1.5px solid var(--border)', borderRadius:'50%', width:'36px', height:'36px', cursor:'pointer', fontSize:'18px', color:'var(--text-muted)', display:'flex', alignItems:'center', justifyContent:'center' }}>×</button>
         </div>
         <div style={{ flex:1, overflowY:'auto', padding:'16px' }}>
           {cart.length === 0 ? (
             <div style={{ textAlign:'center', padding:'60px 24px' }}>
-              <div style={{ fontSize:'48px', marginBottom:'16px' }}>🎁</div>
-              <p style={{ fontSize:'15px', fontWeight:'600', color:'#333' }}>Your gift cart is empty!</p>
-              <p style={{ fontSize:'13px', color:'#888', marginTop:'6px' }}>Find the perfect gift for someone special</p>
+              <div style={{ display:'flex', justifyContent:'center', color:'var(--border)', marginBottom:'16px' }}><Gift size={48} strokeWidth={1.5} /></div>
+              <p style={{ fontSize:'15px', fontWeight:'600', color:'var(--text-body)' }}>Your gift cart is empty!</p>
+              <p style={{ fontSize:'13px', color:'var(--text-muted)', marginTop:'6px' }}>Find the perfect gift for someone special</p>
             </div>
           ) : cart.map(item => (
-            <div key={item.id} style={{ display:'flex', gap:'14px', padding:'16px 0', borderBottom:'1px solid #f8f8f8' }}>
-              <div style={{ width:'80px', height:'80px', borderRadius:'8px', overflow:'hidden', background:'#f8f8f8', flexShrink:0 }}>
+            <div key={`${item.source}-${item.id}`} style={{ display:'flex', gap:'14px', padding:'16px 0', borderBottom:'1px solid var(--border)' }}>
+              <div style={{ width:'80px', height:'80px', borderRadius:'8px', overflow:'hidden', background:'var(--pill)', flexShrink:0 }}>
                 <img src={item.img} alt={item.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e => e.target.style.display='none'} />
               </div>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:'13px', fontWeight:'600', color:'#222' }}>{item.name}</div>
-                <div style={{ fontSize:'12px', color:'#888', marginTop:'2px' }}>₹{item.price}</div>
-                {item.personalMessage && <div style={{ fontSize:'11px', color:'var(--accent)', marginTop:'4px', fontStyle:'italic' }}>✏️ "{item.personalMessage}"</div>}
+                <div style={{ fontSize:'13px', fontWeight:'600', color:'var(--text-hero)' }}>{item.name}</div>
+                <div style={{ fontSize:'12px', color:'var(--text-muted)', marginTop:'2px' }}>₹{item.price}</div>
+                {item.personalMessage && <div style={{ fontSize:'11px', color:'var(--accent)', marginTop:'4px', fontStyle:'italic' }}>"{item.personalMessage}"</div>}
                 <div style={{ display:'flex', alignItems:'center', gap:'12px', marginTop:'10px' }}>
-                  <div style={{ display:'flex', alignItems:'center', border:'1px solid #e0e0e0', borderRadius:'4px', overflow:'hidden' }}>
-                    <button onClick={() => onChangeQty(item.id,-1)} style={{ width:'32px', height:'32px', background:'#f8f8f8', border:'none', cursor:'pointer', fontSize:'18px', color:'#333', display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
+                  <div style={{ display:'flex', alignItems:'center', border:'1.5px solid var(--border)', borderRadius:'14px', overflow:'hidden' }}>
+                    <button onClick={() => onChangeQty(item.id, item.source, -1)} style={{ width:'32px', height:'32px', background:'var(--pill)', border:'none', cursor:'pointer', fontSize:'18px', color:'var(--text-body)', display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
                     <span style={{ width:'36px', textAlign:'center', fontSize:'14px', fontWeight:'600' }}>{item.qty}</span>
-                    <button onClick={() => onChangeQty(item.id,1)} style={{ width:'32px', height:'32px', background:'#f8f8f8', border:'none', cursor:'pointer', fontSize:'18px', color:'#333', display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
+                    <button onClick={() => onChangeQty(item.id, item.source, 1)} style={{ width:'32px', height:'32px', background:'var(--pill)', border:'none', cursor:'pointer', fontSize:'18px', color:'var(--text-body)', display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
                   </div>
-                  <button onClick={() => onRemove(item.id)} style={{ fontSize:'12px', color:'#dc2626', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontWeight:'600', textDecoration:'underline' }}>Remove</button>
+                  <button onClick={() => onRemove(item.id, item.source)} style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'12px', color:'#dc2626', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontWeight:'600' }}><Trash2 size={13} /> Remove</button>
                 </div>
               </div>
-              <span style={{ fontSize:'14px', fontWeight:'700', color:'#222', flexShrink:0 }}>₹{item.price*item.qty}</span>
+              <span style={{ fontSize:'14px', fontWeight:'700', color:'var(--text-hero)', flexShrink:0 }}>₹{item.price*item.qty}</span>
             </div>
           ))}
         </div>
         {cart.length > 0 && (
           <div style={{ padding:'20px 24px', borderTop:'1px solid #f0f0f0' }}>
             <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'16px' }}>
-              <span style={{ fontSize:'15px', fontWeight:'700', color:'#222' }}>Total Amount</span>
+              <span style={{ fontSize:'15px', fontWeight:'700', color:'var(--text-hero)' }}>Total Amount</span>
               <span style={{ fontSize:'15px', fontWeight:'700', color:'var(--accent)' }}>₹{total}</span>
             </div>
             <div style={{ fontSize:'11px', color:'var(--accent)', textAlign:'center', marginBottom:'12px', fontWeight:'600' }}>🎀 Free gift wrapping on orders above ₹499</div>
-            <button onClick={handleOrder} disabled={ordering} style={{ width:'100%', padding:'16px', borderRadius:'4px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", opacity: ordering ? 0.7 : 1 }}>
+            <button onClick={handleOrder} disabled={ordering} style={{ width:'100%', padding:'16px', borderRadius:'14px', border:'none', background:'var(--accent)', color:'#fff', fontSize:'15px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", opacity: ordering ? 0.7 : 1 }}>
   {ordering ? 'Placing order...' : 'PLACE ORDER →'}
 </button>
           </div>
@@ -403,35 +420,35 @@ const GiftCardImproved = ({ product, onAddToCart, isMobile }) => {
   const discount = product.originalPrice ? Math.round((1 - product.price/product.originalPrice)*100) : null
 
   return (
-    <div style={{ background:'#fff', borderRadius:'4px', overflow:'hidden', cursor:'pointer', position:'relative', border:'1px solid #f0f0f0', transition:'box-shadow 0.2s', boxShadow: hovered ? '0 4px 20px rgba(0,0,0,0.1)' : 'none' }}
+    <div style={{ background:'var(--surface)', borderRadius:'14px', overflow:'hidden', cursor:'pointer', position:'relative', border:'1.5px solid var(--border)', transition:'box-shadow 0.2s', boxShadow: hovered ? '0 4px 20px rgba(0,0,0,0.1)' : 'none' }}
       onMouseEnter={() => !isMobile && setHovered(true)}
       onMouseLeave={() => !isMobile && setHovered(false)}>
 
-      <div style={{ position:'relative', paddingTop:'110%', background:'#f8f8f8', overflow:'hidden' }}>
+      <div style={{ position:'relative', paddingTop:'110%', background:'var(--pill)', overflow:'hidden' }}>
         <img src={product.img} alt={product.name}
           style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.4s ease', transform: hovered ? 'scale(1.06)' : 'scale(1)' }}
           onError={e => e.target.style.display='none'} />
 
         <button onClick={e => { e.stopPropagation(); setWishlist(!wishlist) }}
-          style={{ position:'absolute', top:'8px', right:'8px', background:'#fff', border:'none', borderRadius:'50%', width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 8px rgba(0,0,0,0.12)', fontSize:'16px', zIndex:2 }}>
-          {wishlist ? '❤️' : '🤍'}
+          style={{ position:'absolute', top:'8px', right:'8px', background:'var(--surface)', border:'none', borderRadius:'50%', width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 8px rgba(0,0,0,0.12)', zIndex:2, color: wishlist ? '#e11d48' : 'var(--text-muted)' }}>
+          <Heart size={16} fill={wishlist ? 'currentColor' : 'none'} />
         </button>
 
         {product.badge && (
-          <span style={{ position:'absolute', top:'8px', left:'8px', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background: product.badge==='Bestseller'?'#ff6161':'var(--accent)', color:'#fff', letterSpacing:'0.04em', zIndex:2 }}>
+          <span style={{ position:'absolute', top:'8px', left:'8px', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'50px', background: product.badge==='Bestseller'?'#ff6161':'var(--accent)', color:'#fff', letterSpacing:'0.04em', zIndex:2 }}>
             {product.badge.toUpperCase()}
           </span>
         )}
 
         {discount && (
-          <span style={{ position:'absolute', bottom:'8px', left:'8px', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background:'#14a800', color:'#fff', zIndex:2 }}>
+          <span style={{ position:'absolute', bottom:'8px', left:'8px', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'50px', background:'#14a800', color:'#fff', zIndex:2 }}>
             {discount}% OFF
           </span>
         )}
 
         {product.eco && (
-          <span style={{ position:'absolute', bottom:'8px', right:'8px', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'2px', background:'rgba(255,255,255,0.9)', color:'#14a800', zIndex:2 }}>
-            🌱 Eco
+          <span style={{ position:'absolute', bottom:'8px', right:'8px', display:'inline-flex', alignItems:'center', gap:'3px', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'50px', background:'rgba(255,255,255,0.9)', color:'#14a800', zIndex:2 }}>
+            <Leaf size={11} /> Eco
           </span>
         )}
 
@@ -439,55 +456,55 @@ const GiftCardImproved = ({ product, onAddToCart, isMobile }) => {
         {!isMobile && (
           <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'var(--text-hero)', padding:'12px', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', transform: hovered?'translateY(0)':'translateY(100%)', transition:'transform 0.25s ease', zIndex:3 }}
             onClick={e => { e.stopPropagation(); handleAdd() }}>
-            <span style={{ fontSize:'16px' }}>{added?'✓':'🎁'}</span>
+            {added ? <Check size={16} color="#fff" /> : <Gift size={16} color="#fff" />}
             <span style={{ fontSize:'13px', fontWeight:'700', color:'#fff', letterSpacing:'0.05em' }}>{added?'ADDED!':'ADD TO GIFT CART'}</span>
           </div>
         )}
       </div>
 
       <div style={{ padding: isMobile ? '8px 10px 12px' : '12px 12px 14px' }}>
-        <div style={{ fontSize:'10px', color:'#888', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:'3px' }}>{product.category}</div>
-        <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'#222', lineHeight:'1.4', marginBottom:'4px' }}>{product.name}</div>
+        <div style={{ fontSize:'10px', color:'var(--text-muted)', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:'3px' }}>{product.category}</div>
+        <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight:'600', color:'var(--text-hero)', lineHeight:'1.4', marginBottom:'4px' }}>{product.name}</div>
 
         {!isMobile && (
-          <div style={{ fontSize:'12px', color:'#888', lineHeight:'1.5', marginBottom:'8px', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{product.description}</div>
+          <div style={{ fontSize:'12px', color:'var(--text-muted)', lineHeight:'1.5', marginBottom:'8px', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{product.description}</div>
         )}
 
         {/* Occasion tags */}
         <div style={{ display:'flex', flexWrap:'wrap', gap:'4px', marginBottom:'6px' }}>
           {product.occasions.slice(0,isMobile?1:2).map(o => (
-            <span key={o} style={{ fontSize:'10px', fontWeight:'600', padding:'2px 7px', borderRadius:'50px', background:'#fdf4ff', color:'#7e22ce', border:'1px solid #e9d5ff' }}>{o}</span>
+            <span key={o} style={{ fontSize:'10px', fontWeight:'600', padding:'2px 7px', borderRadius:'50px', background:'var(--pill)', color:'var(--accent)', border:'1px solid var(--border)' }}>{o}</span>
           ))}
           {!isMobile && (
-            <span style={{ fontSize:'10px', fontWeight:'600', padding:'2px 7px', borderRadius:'50px', background:'#fff8f0', color:'#c2410c', border:'1px solid #fed7aa' }}>{product.recipient}</span>
+            <span style={{ fontSize:'10px', fontWeight:'600', padding:'2px 7px', borderRadius:'50px', background:'var(--bg)', color:'var(--text-body)', border:'1px solid var(--border)' }}>{product.recipient}</span>
           )}
         </div>
 
         {/* Delivery */}
         <div style={{ marginBottom:'6px' }}>
-          <span style={{ fontSize:'10px', fontWeight:'600', padding:'2px 8px', borderRadius:'2px', background: product.delivery==='Same Day'?'#dcfce7':product.delivery==='Express'?'#dbeafe':'#f3f4f6', color: product.delivery==='Same Day'?'#166534':product.delivery==='Express'?'#1d4ed8':'#374151' }}>
-            🚚 {product.delivery}
+          <span style={{ display:'inline-flex', alignItems:'center', gap:'4px', fontSize:'10px', fontWeight:'600', padding:'2px 8px', borderRadius:'50px', background: product.delivery==='Same Day'?'#dcfce7':product.delivery==='Express'?'#dbeafe':'#f3f4f6', color: product.delivery==='Same Day'?'#166534':product.delivery==='Express'?'#1d4ed8':'#374151' }}>
+            <Truck size={11} /> {product.delivery}
           </span>
         </div>
 
         {/* Rating */}
         <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'6px' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:'3px', background:'var(--accent)', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'2px 6px', borderRadius:'2px' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:'3px', background:'var(--accent)', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'2px 6px', borderRadius:'50px' }}>
             {product.rating} ★
           </div>
-          <span style={{ fontSize:'10px', color:'#888' }}>({product.reviews.toLocaleString()})</span>
+          <span style={{ fontSize:'10px', color:'var(--text-muted)' }}>({product.reviews.toLocaleString()})</span>
         </div>
 
         {/* Price + mobile add button */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'4px', marginBottom: isMobile ? '0' : '10px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'4px', flexWrap:'wrap' }}>
-            <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight:'700', color:'#222' }}>₹{product.price}</span>
-            {product.originalPrice && <span style={{ fontSize:'11px', color:'#aaa', textDecoration:'line-through' }}>₹{product.originalPrice}</span>}
+            <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight:'700', color:'var(--text-hero)' }}>₹{product.price}</span>
+            {product.originalPrice && <span style={{ fontSize:'11px', color:'var(--text-muted)', textDecoration:'line-through' }}>₹{product.originalPrice}</span>}
           </div>
           {isMobile && (
             <button onClick={e => { e.stopPropagation(); handleAdd() }}
-              style={{ padding:'7px 14px', borderRadius:'4px', border:`1px solid ${added?'var(--accent)':'#e0e0e0'}`, background: added?'var(--accent)':'#fff', color: added?'#fff':'#333', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", transition:'all 0.2s', flexShrink:0 }}>
-              {added ? '✓ Added' : '+ Add'}
+              style={{ display:'flex', alignItems:'center', gap:'4px', padding:'7px 14px', borderRadius:'14px', border:`1px solid ${added?'var(--accent)':'var(--border)'}`, background: added?'var(--accent)':'var(--surface)', color: added?'#fff':'var(--text-body)', fontSize:'12px', fontWeight:'600', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", transition:'all 0.2s', flexShrink:0 }}>
+              {added ? <Check size={13} /> : null} {added ? 'Added' : '+ Add'}
             </button>
           )}
         </div>
@@ -496,13 +513,13 @@ const GiftCardImproved = ({ product, onAddToCart, isMobile }) => {
         {!isMobile && (
           <>
             <button onClick={e => { e.stopPropagation(); setShowMsg(!showMsg) }}
-              style={{ fontSize:'12px', fontWeight:'600', color:'var(--accent)', background:'none', border:'1px solid var(--border)', borderRadius:'4px', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", padding:'6px 12px', width:'100%', marginBottom: showMsg?'8px':'0', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px' }}>
+              style={{ fontSize:'12px', fontWeight:'600', color:'var(--accent)', background:'none', border:'1px solid var(--border)', borderRadius:'14px', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", padding:'6px 12px', width:'100%', marginBottom: showMsg?'8px':'0', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px' }}>
               ✏️ {showMsg ? 'Hide message' : 'Add a personal message'}
             </button>
             {showMsg && (
               <textarea placeholder="e.g. Happy Birthday Riya! 🌿" value={message} onChange={e => setMessage(e.target.value)} rows={2}
                 onClick={e => e.stopPropagation()}
-                style={{ width:'100%', padding:'8px 12px', borderRadius:'4px', border:'1px solid #e0e0e0', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", color:'#333', outline:'none', resize:'none', boxSizing:'border-box' }} />
+                style={{ width:'100%', padding:'8px 12px', borderRadius:'14px', border:'1.5px solid var(--border)', fontSize:'12px', fontFamily:"'DM Sans',sans-serif", color:'var(--text-body)', outline:'none', resize:'none', boxSizing:'border-box' }} />
             )}
           </>
         )}
@@ -513,7 +530,7 @@ const GiftCardImproved = ({ product, onAddToCart, isMobile }) => {
 
 // ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 const Gifting = () => {
-  const [cart, setCart]           = useState([])
+  const { cart, addToCart: addToCartShared, removeFromCart, changeQty, clearCart } = useCart()
   const [cartOpen, setCartOpen]   = useState(false)
   const [filters, setFilters]     = useState({})
   const [sortBy, setSortBy]       = useState('featured')
@@ -527,15 +544,9 @@ const Gifting = () => {
   }, [])
 
   const addToCart = (product) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.id === product.id)
-      if (existing) return prev.map(i => i.id===product.id ? { ...i, qty:i.qty+1 } : i)
-      return [...prev, { ...product, qty:1 }]
-    })
+    addToCartShared(product, 'gifting')
+    toast.success(`${product.name} added to gift cart! 🎁`)
   }
-
-  const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id))
-  const changeQty = (id, delta) => setCart(prev => prev.map(i => i.id===id ? {...i, qty:i.qty+delta} : i).filter(i => i.qty > 0))
 
   let filtered = PRODUCTS.filter(p => {
     const matchOccasion  = !filters.occasion?.length  || filters.occasion.some(o => p.occasions.includes(o))
@@ -555,16 +566,16 @@ const Gifting = () => {
   const hasFilters = filters.occasion?.length || filters.recipient?.length || filters.delivery?.length || filters.priceMin
 
   return (
-    <div style={{ minHeight:'100vh', background:'#fafafa', display:'flex', flexDirection:'column' }}>
+    <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column' }}>
       <GiftNav cartCount={cartCount} onCartOpen={() => setCartOpen(true)} isMobile={isMobile} />
 
       {/* Breadcrumb — desktop only */}
       {!isMobile && (
-        <div style={{ background:'#fff', borderBottom:'1px solid #f0f0f0', padding:'10px 32px' }}>
-          <div style={{ maxWidth:'1440px', margin:'0 auto', fontSize:'12px', color:'#888', display:'flex', gap:'6px', alignItems:'center' }}>
-            <Link to="/" style={{ color:'#888', textDecoration:'none' }}>Home</Link>
+        <div style={{ background:'var(--surface)', borderBottom:'1.5px solid var(--border)', padding:'10px 32px' }}>
+          <div style={{ maxWidth:'1440px', margin:'0 auto', fontSize:'12px', color:'var(--text-muted)', display:'flex', gap:'6px', alignItems:'center' }}>
+            <Link to="/" style={{ color:'var(--text-muted)', textDecoration:'none' }}>Home</Link>
             <span>›</span>
-            <span style={{ color:'#222', fontWeight:'600' }}>Gifting</span>
+            <span style={{ color:'var(--text-hero)', fontWeight:'600' }}>Gifting</span>
           </div>
         </div>
       )}
@@ -583,12 +594,15 @@ const Gifting = () => {
           <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)', marginTop:'2px' }}>Plantable seeds with every bouquet</p>
         </div>
         <div style={{ display:'flex', gap:'10px', flexShrink:0 }}>
-          {[['🌱','Eco'],['🎀','Wrap'],['🚚','Fast']].map(([icon,label]) => (
-            <div key={label} style={{ textAlign:'center' }}>
-              <div style={{ fontSize:'16px' }}>{icon}</div>
-              <div style={{ fontSize:'9px', fontWeight:'600', color:'rgba(255,255,255,0.55)', whiteSpace:'nowrap' }}>{label}</div>
+          {[[Leaf,'Eco'],[Gift,'Wrap'],[Truck,'Fast']].map((item) => {
+            const IconComp = item[0]
+            return (
+            <div key={item[1]} style={{ textAlign:'center' }}>
+              <div style={{ display:'flex', justifyContent:'center', color:'#fff' }}><IconComp size={16} /></div>
+              <div style={{ fontSize:'9px', fontWeight:'600', color:'rgba(255,255,255,0.55)', whiteSpace:'nowrap' }}>{item[1]}</div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     ) : (
@@ -602,12 +616,15 @@ const Gifting = () => {
           <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.55)', marginTop:'6px' }}>Every bouquet comes with plantable seeds. Zero waste, 100% love.</p>
         </div>
         <div style={{ display:'flex', gap:'16px' }}>
-          {[['🌱','Eco Friendly'],['🎀','Free Wrapping'],['🚚','Same Day'],['💯','Guaranteed']].map(([icon,label]) => (
-            <div key={label} style={{ textAlign:'center' }}>
-              <div style={{ fontSize:'22px', marginBottom:'4px' }}>{icon}</div>
-              <div style={{ fontSize:'10px', fontWeight:'600', color:'rgba(255,255,255,0.6)', whiteSpace:'nowrap' }}>{label}</div>
+          {[[Leaf,'Eco Friendly'],[Gift,'Free Wrapping'],[Truck,'Same Day'],[Award,'Guaranteed']].map((item) => {
+            const IconComp = item[0]
+            return (
+            <div key={item[1]} style={{ textAlign:'center' }}>
+              <div style={{ display:'flex', justifyContent:'center', color:'#fff', marginBottom:'4px' }}><IconComp size={22} /></div>
+              <div style={{ fontSize:'10px', fontWeight:'600', color:'rgba(255,255,255,0.6)', whiteSpace:'nowrap' }}>{item[1]}</div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     )}
@@ -623,25 +640,25 @@ const Gifting = () => {
 
           {/* Desktop toolbar */}
           {!isMobile && (
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'16px', background:'#fff', padding:'12px 16px', borderRadius:'4px', border:'1px solid #f0f0f0' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'16px', background:'var(--surface)', padding:'12px 16px', borderRadius:'14px', border:'1.5px solid var(--border)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap' }}>
-                <span style={{ fontSize:'13px', color:'#888' }}>Showing <strong style={{ color:'#222' }}>{filtered.length}</strong> gifts</span>
+                <span style={{ fontSize:'13px', color:'var(--text-muted)' }}>Showing <strong style={{ color:'var(--text-hero)' }}>{filtered.length}</strong> gifts</span>
                 {[
                   ...(filters.occasion||[]).map(v => ({ label:v, clear:() => setFilters(p => ({...p, occasion:(p.occasion||[]).filter(c=>c!==v)})) })),
                   ...(filters.recipient||[]).map(v => ({ label:v, clear:() => setFilters(p => ({...p, recipient:(p.recipient||[]).filter(c=>c!==v)})) })),
                   ...(filters.delivery||[]).map(v => ({ label:v, clear:() => setFilters(p => ({...p, delivery:(p.delivery||[]).filter(c=>c!==v)})) })),
                   ...(filters.priceMin ? [{ label:`₹${filters.priceMin}–${filters.priceMax}`, clear:() => setFilters(p => ({...p, priceMin:undefined, priceMax:undefined})) }] : []),
                 ].map((f,i) => (
-                  <span key={i} style={{ display:'inline-flex', alignItems:'center', gap:'4px', padding:'4px 10px', background:'#fff3f0', borderRadius:'50px', border:'1px solid #ffd5cc', fontSize:'12px', color:'var(--accent)', fontWeight:'600' }}>
+                  <span key={i} style={{ display:'inline-flex', alignItems:'center', gap:'4px', padding:'4px 10px', background:'var(--pill)', borderRadius:'50px', border:'1px solid var(--border)', fontSize:'12px', color:'var(--accent)', fontWeight:'600' }}>
                     {f.label}
                     <button onClick={f.clear} style={{ background:'none', border:'none', cursor:'pointer', fontSize:'14px', color:'var(--accent)', lineHeight:1, padding:0 }}>×</button>
                   </span>
                 ))}
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
-                <span style={{ fontSize:'13px', color:'#888' }}>Sort by:</span>
+                <span style={{ fontSize:'13px', color:'var(--text-muted)' }}>Sort by:</span>
                 <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-                  style={{ padding:'6px 12px', border:'1px solid #e0e0e0', borderRadius:'4px', background:'#fff', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", color:'#333', outline:'none', cursor:'pointer' }}>
+                  style={{ padding:'6px 12px', border:'1.5px solid var(--border)', borderRadius:'14px', background:'var(--surface)', fontSize:'13px', fontFamily:"'DM Sans',sans-serif", color:'var(--text-body)', outline:'none', cursor:'pointer' }}>
                   <option value="featured">Recommended</option>
                   <option value="price_asc">Price: Low to High</option>
                   <option value="price_desc">Price: High to Low</option>
@@ -654,7 +671,7 @@ const Gifting = () => {
           {/* Mobile count bar */}
           {isMobile && (
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px' }}>
-              <span style={{ fontSize:'13px', color:'#888' }}><strong style={{ color:'#222' }}>{filtered.length}</strong> gifts</span>
+              <span style={{ fontSize:'13px', color:'var(--text-muted)' }}><strong style={{ color:'var(--text-hero)' }}>{filtered.length}</strong> gifts</span>
               {hasFilters && (
                 <button onClick={() => setFilters({})} style={{ fontSize:'12px', color:'var(--accent)', background:'none', border:'none', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontWeight:'600' }}>
                   Clear filters ×
@@ -665,11 +682,11 @@ const Gifting = () => {
 
           {/* Products */}
           {filtered.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'60px 24px', background:'#fff', borderRadius:'4px' }}>
-              <div style={{ fontSize:'48px', marginBottom:'16px' }}>🎁</div>
-              <p style={{ fontSize:'16px', fontWeight:'600', color:'#333' }}>No gifts found</p>
-              <p style={{ fontSize:'13px', color:'#888', marginTop:'4px' }}>Try adjusting your filters</p>
-              <button onClick={() => setFilters({})} style={{ marginTop:'16px', padding:'10px 24px', background:'var(--accent)', color:'#fff', border:'none', borderRadius:'4px', fontSize:'13px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
+            <div style={{ textAlign:'center', padding:'60px 24px', background:'var(--surface)', borderRadius:'14px' }}>
+              <div style={{ display:'flex', justifyContent:'center', color:'var(--border)', marginBottom:'16px' }}><Search size={48} strokeWidth={1.5} /></div>
+              <p style={{ fontSize:'16px', fontWeight:'600', color:'var(--text-body)' }}>No gifts found</p>
+              <p style={{ fontSize:'13px', color:'var(--text-muted)', marginTop:'4px' }}>Try adjusting your filters</p>
+              <button onClick={() => setFilters({})} style={{ marginTop:'16px', padding:'10px 24px', background:'var(--accent)', color:'#fff', border:'none', borderRadius:'14px', fontSize:'13px', fontWeight:'700', cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>
                 Clear All Filters
               </button>
             </div>
@@ -685,7 +702,7 @@ const Gifting = () => {
 
       {/* Mobile bottom bar */}
       {isMobile && (
-        <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'#fff', borderTop:'1px solid #e0e0e0', display:'flex', zIndex:50, boxShadow:'0 -2px 12px rgba(0,0,0,0.08)' }}>
+        <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'var(--surface)', borderTop:'1.5px solid var(--border)', display:'flex', zIndex:50, boxShadow:'0 -2px 12px rgba(0,0,0,0.08)' }}>
           <button onClick={() => setSheetMode('filter')}
             style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'14px', background:'none', border:'none', borderRight:'1px solid #e0e0e0', cursor:'pointer', fontFamily:"'DM Sans',sans-serif", fontSize:'14px', fontWeight:'600', color: hasFilters ? 'var(--accent)' : '#333' }}>
             <span>⚙️</span>
@@ -704,7 +721,7 @@ const Gifting = () => {
         <MobileGiftFilterSheet filters={filters} setFilters={setFilters} onClose={() => setSheetMode(null)} mode={sheetMode} />
       )}
 
-      {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} onRemove={removeFromCart} onChangeQty={changeQty} isMobile={isMobile} />}
+      {cartOpen && <CartDrawer cart={cart} onClose={() => setCartOpen(false)} onRemove={removeFromCart} onChangeQty={changeQty} onOrdered={clearCart} isMobile={isMobile} />}
     </div>
   )
 }

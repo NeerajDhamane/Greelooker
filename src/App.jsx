@@ -15,11 +15,13 @@ import NotFound    from './pages/NotFound'
 import Navbar      from './components/Navbar'
 import PrivateRoute from './components/PrivateRoute'
 import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
 
 const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <CartProvider>
         <Navbar />
         <Routes>
 
@@ -43,6 +45,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
 
         </Routes>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   )
